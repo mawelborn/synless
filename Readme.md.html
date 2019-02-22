@@ -1,0 +1,266 @@
+Synless Templates
+=================
+
+Explanatory Blurb.
+
+
+API
+===
+
+Synless.compile(template[, options]) => Function
+------------------------------------------------
+
+Compile the `template` representation using `options` to an IDOM render function. `template` can be
+an HTML string or object (including arrays of objects) that conform to the DOM spec. This includes
+entire `Document`s, `DocumentFragment`s, `Node`s, `NodeList`s, and `HTMLCollection`s. The following
+are all valid uses:
+
+~~~JavaScript
+var render_function = Synless.compile("<p>HTML String</p>");
+render_function = Synless.compile(document.getElementById("template"));
+render_function = Synless.compile(document.body.childNodes);
+render_function = Synless.compile(document.querySelectorAll("p"));
+IncrementalDOM.patch(document.body, render_function, [...users]);
+~~~
+
+
+Synless.precompile(template[, options]) => String
+-------------------------------------------------
+
+Compile the `template` representation using `options` to a JavaScript IIFE that returns an IDOM
+render function. This can be used to precompile templates server-side. `template` can be an HTML
+string or an object (or array of objects) that conform to the Document Object Model spec.
+
+~~~JavaScript
+fs.writeFileSync("template.js", "var template = " + Synless.precompile("<p>HTML String</p>"));
+~~~
+
+
+Configuration
+=============
+
+Options
+-------
+
+Specify template options for compilation globally using `Synless.options` or per template using the
+`options` parameter to `Synless.compile` and `Synless.precompile`. Compilation options are:
+
+variable
+:   The name of the variable that data passed to the render function will be assigned to. Default: data
+
+
+DOM Parser
+----------
+
+Synless compiles templates by walking DOM trees and emitting Incremental DOM JavaScript code. HTML
+strings are first converted to a DOM tree with `Synless.dom_parser`. By default, it uses the current
+environment's `document` object to parse HTML.
+
+If used in a non-browser environment, `dom_parser` should be overwritten with a function that takes
+an HTML string and returns a list of `Node`s for the string. Synless supports HTML strings with
+multiple root elements, and any `dom_parser` replacement should do the same.
+
+~~~JavaScript
+Synless.dom_parser = html_string => {
+    let wrapper = document.createElement("div");
+    wrapper.innerHTML = html_string;
+    return wrapper.childNodes;
+};
+~~~
+
+
+Attributes, Properties, Text, and HTML
+======================================
+
+Text
+----
+
+Use the `sl-text` directive to specify the text content of the element it's found on. The element
+should not have any child nodes. If it does, they will be ignored and replaced with the specified
+text content. The value of `sl-text` can be any valid JavaScript expression.
+
+~~~HTML
+<span sl-text="data.name"></span>
+<span sl-text="Date.now()"></span>
+<span sl-text="backbone_model.get('title')"></span>
+<span sl-text="1+2">Existing child nodes are discarded.</span>
+~~~
+
+Would compile to:
+
+~~~JavaScript
+elementOpen("span");
+    text(data.name);
+elementClose("span");
+elementOpen("span");
+    text(Date.now());
+elementClose("span");
+elementOpen("span");
+    text(backbone_model.get('title'));
+elementClose("span");
+elementOpen("span");
+    text(1+2);
+elementClose("span");
+~~~
+
+
+Control Directives
+==================
+
+Control directives compile to the control statement wrapped around the element that the directive is
+found on. Iteration has higher precendence than conditionals.
+
+Skip
+----
+
+Use `sl-skip` to prevent Incremental DOM from patching the tree below the element that the directive
+is found on. This is useful for when something else manages an element's children, like a container
+for the Views of a Backbone Collection. Incremental DOM will create and manage attributes for the
+element that this directive is found on.
+
+~~~HTML
+<div id="container" sl-skip>
+    ... Subtree items are not patched by IDOM ...
+</div>
+~~~
+
+Would compile to:
+
+~~~JavaScript
+elementOpen("div", null, null, "id", "container");
+skip();
+elementClose("div");
+~~~
+
+
+Each
+----
+
+Use `sl-each` to repeat an element once for value in an array or object. Specify the name of the
+iterable, followed by a colon, followed by the name to assign the value to in each iteration.
+
+~~~HTML
+<ul>
+    <li sl-each="data.list_items:item">
+        <a sl-attr:href="item.url" sl-text="item.name"></a>
+    </li>
+</ul>
+~~~
+
+Is equivalent to:
+
+~~~Mustache
+<ul>
+    {{#list_items}}
+    <li>
+        <a href="{{url}}">{{name}}</a>
+    </li>
+    {{/list_items}}
+</ul>
+~~~
+
+And would compile to:
+
+~~~JavaScript
+elementOpen("ul");
+_.each(data.list_items, function(item) {
+    elementOpen("li");
+        elementOpen("a", null, null, "href", item.url);
+            text(item.name);
+        elementClose("a");
+    elementClose("li");
+});
+elementClose("ul");
+~~~
+
+
+If, Else If, Else
+-----------------
+
+Use `sl-if`, `sl-elif`, and `sl-else` to conditionally render an element. The value of `sl-if` of
+`sl-elif` is placed in the corresponding JavaScript conditional and supports any valid JavaScript
+expression.
+
+~~~HTML
+<p sl-if="data.logged_in">
+    Hello, <span sl-text="data.user_name"></span>!
+</p>
+<p sl-else>
+    Hello, stranger!
+</p>
+~~~
+
+Is equivalent to:
+
+~~~Mustache
+{{#logged_in}}
+<p>
+    Hello, {{user_name}}!
+</p>
+{{/logged_in}}
+{{^logged_in}}
+<p>
+    Hello, stranger!
+</p>
+{{/logged_in}}
+~~~
+
+And would compile to:
+
+~~~JavaScript
+if (data.logged_in) {
+    elementOpen("p");
+        text("Hello, ");
+        elementOpen("span");
+            text(data.user);
+        elementClose("span");
+        text("!");
+    elementClose("p");
+}
+else {
+    elementOpen("p");
+        text("Hello, stranger!");
+    elementClose("p");
+}
+~~~
+
+Iteration has higher precedence than conditionals, which allows compact representations like the
+following:
+
+~~~HTML
+<ul>
+    <li sl-each="data.list_items:item"
+        sl-if="!item.hidden"
+        sl-text="item.name"></li>
+</ul>
+~~~
+
+Which is equivalent to:
+
+~~~Mustache
+<ul>
+    {{#list_items}}
+    {{^hidden}}
+    <li>{{name}}</li>
+    {{/hidden}}
+    {{/list_items}}
+</ul>
+~~~
+
+And compiles to:
+
+~~~JavaScript
+elementOpen("ul");
+_.each(data.list_items, function(item) {
+    if (!item.hidden) {
+        elementOpen("li");
+            text(item.name);
+        elementClose("li");
+    }
+});
+elementClose("ul");
+~~~
+
+
+<style>body { font-family: sans; }</style>
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
