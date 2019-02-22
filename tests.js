@@ -40,11 +40,20 @@ QUnit.test("Text", assert => {
 
 QUnit.test("Attributes", assert => {
     assert.equal(Synless.compile(`<input type="text">`).toString(),
-                 `function(data){v("input","k0",null,"type","text");}`,
+                 `function(data){v("input","k0",a0);}`,
                  "Input type text");
     assert.equal(Synless.compile(`<input type="text" disabled>`).toString(),
-                 `function(data){v("input","k0",null,"type","text","disabled","");}`,
-                 "Input type text");
+                 `function(data){v("input","k0",a0);}`,
+                 "Input type text, Disabled");
+    assert.equal(Synless.precompile(`<input type="text" disabled>`),
+                 `!function(){var t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a0=["disabled","","type","text"];return function(data){v("input","k0",a0);};}();`,
+                 "Hoisted Input type text, Disabled");
+    assert.equal(Synless.precompile(`<input type="text" class="form-control" value="something"><input class="form-control" value="something" type="text">`),
+                 `!function(){var t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a0=["class","form-control","type","text","value","something"];return function(data){v("input","k0",a0);v("input","k1",a0);};}();`,
+                 "Reuse Hoisted");
+    assert.equal(Synless.precompile(`<input type="text" class="form-control" value="something"><input type="text" class="form-control">`),
+                 `!function(){var t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a0=["class","form-control","type","text","value","something"],a1=["class","form-control","type","text"];return function(data){v("input","k0",a0);v("input","k1",a1);};}();`,
+                 "Differentiate Hoisted");
 });
 
 QUnit.test("Control Statements", assert => {

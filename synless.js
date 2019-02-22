@@ -38,10 +38,11 @@
                       "c=IncrementalDOM.elementClose",
                       "v=IncrementalDOM.elementVoid",
                       "s=IncrementalDOM.skip"];
+        const hoisted = {};
         const code = [];
 
         nodes = prepare_nodes(nodes);
-        compile_nodes(vars, code, nodes);
+        compile_nodes(vars, hoisted, code, nodes);
 
         return `var ${vars.join(",")};return function(${options.variable}){${code.join("")}};`;
     };
@@ -64,19 +65,21 @@
     };
 
 
-    const compile_nodes = (vars, code, nodes) => _.each(nodes, node => {
+    const compile_nodes = (vars, hoisted, code, nodes) => _.each(nodes, node => {
         if (node.nodeType == 9)
             node == node.documentElement;
         if (node.nodeType == 3)
             code.push("t(" + escape_string(node.nodeValue) + ");");
         if (node.nodeType == 1)
-            compile_element(vars, code, node);
+            compile_element(vars, hoisted, code, node);
     });
 
 
-    const compile_element = (vars, code, element) => {
+    const compile_element = (vars, hoisted, code, element) => {
         const [sl_attrs, el_attrs] = get_attrs(element);
+        let attrs = {};
         let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : escape_string(unique_id("k"));
+        const hoist_var = hoist_attributes(vars, hoisted, el_attrs);
 
         if (_.has(sl_attrs, "sl-each")) {
             let iterator, iteratee, index, rest;
@@ -100,15 +103,15 @@
             code.push("else{");
 
         if (_.has(sl_attrs, "sl-skip"))
-            wrap_with_element(code, element, key, el_attrs, "s();");
+            wrap_with_element(code, element, key, hoist_var, attrs, "s();");
         else if (_.has(sl_attrs, "sl-text"))
-            wrap_with_element(code, element, key, el_attrs,
+            wrap_with_element(code, element, key, hoist_var, attrs,
                               `t(${sl_attrs["sl-text"]});`);
         else if (_.isEmpty(element.childNodes))
-            void_element(code, element, key, el_attrs);
+            void_element(code, element, key, hoist_var, attrs);
         else {
-            open_element(code, element, key, el_attrs);
-            compile_nodes(vars, code, _.toArray(element.childNodes));
+            open_element(code, element, key, hoist_var, attrs);
+            compile_nodes(vars, hoisted, code, _.toArray(element.childNodes));
             close_element(code, element);
         }
 
@@ -135,12 +138,12 @@
     };
 
 
-    const void_element = (code, el, key, attrs) => vo_element("v", code, el, key, attrs);
-    const open_element = (code, el, key, attrs) => vo_element("o", code, el, key, attrs);
-    const vo_element = (func, code, el, key, attrs) => {
+    const void_element = (code, el, key, hoist, attrs) => vo_element("v", code, el, key, hoist, attrs);
+    const open_element = (code, el, key, hoist, attrs) => vo_element("o", code, el, key, hoist, attrs);
+    const vo_element = (func, code, el, key, hoist, attrs) => {
         code.push(`${func}(${tag_name(el)},${key}`);
-        if (_.keys(attrs).length > 0)
-            code.push(",null");
+        if (hoist != "null" || _.keys(attrs).length > 0)
+            code.push(`,${hoist}`);
         _.each(attrs, (value, name) => code.push(`,${escape_string(name)},${escape_string(value)}`));
         code.push(");");
     };
@@ -151,10 +154,27 @@
     };
 
 
-    const wrap_with_element = (code, el, key, attrs, wrapped) => {
-        open_element(code, el, key, attrs);
+    const wrap_with_element = (code, el, key, hoist, attrs, wrapped) => {
+        open_element(code, el, key, hoist, attrs);
         code.push(wrapped);
         close_element(code, el);
+    };
+
+
+    const hoist_attributes = (vars, hoisted, attrs) => {
+        if (_.keys(attrs).length == 0)
+            return "null";
+        attrs = _.map(_.keys(attrs).sort(),
+                      key => `${escape_string(key)},${escape_string(attrs[key])}`);
+        attrs = `[${attrs.join(",")}]`;
+        if (_.has(hoisted, attrs))
+            return hoisted[attrs];
+        else {
+            let hoist_var = unique_id("a");
+            vars.push(`${hoist_var}=${attrs}`);
+            hoisted[attrs] = hoist_var;
+            return hoist_var;
+        }
     };
 
 
