@@ -20,12 +20,18 @@
     Synless.options = {variable: "data"};
 
 
-    let counter = 0;
-    const unique_key = (prefix) => "" + prefix + counter++;
+    let counters = {};
+    const increment_counter = prefix => {
+        if (!_.has(counters, prefix))
+            counters[prefix] = 0;
+        return counters[prefix]++;
+    };
+    const unique_id = prefix => "" + prefix + increment_counter(prefix);
 
 
     const renderer_for = (nodes, options) => {
         options = _.extend({}, Synless.options, options);
+        counters = {};
 
         const vars = ["t=IncrementalDOM.text",
                       "o=IncrementalDOM.elementOpen",
@@ -70,10 +76,20 @@
 
     const compile_element = (vars, code, element) => {
         const [sl_attrs, el_attrs] = get_attrs(element);
+        let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : escape_string(unique_id("k"));
 
         if (_.has(sl_attrs, "sl-each")) {
-            let [iterator, iteratee] = sl_attrs["sl-each"].split(":");
-            code.push(`_.each(${iterator},function(${iteratee}){`);
+            let iterator, iteratee, index, rest;
+            [iterator, iteratee] = sl_attrs["sl-each"].split(":");
+            if (!iteratee || iteratee == "")
+                iteratee = "_0";
+            [iteratee, index, ...rest] = iteratee.split(",");
+            if (!index || index == "")
+                index = "_1";
+            if (rest.length == 0)
+                rest.push("_2");
+            key = `${index}+${key}`;
+            code.push(`_.each(${iterator},function(${iteratee},${index},${rest.join(",")}){`);
         }
 
         if (_.has(sl_attrs, "sl-if"))
@@ -84,14 +100,14 @@
             code.push("else{");
 
         if (_.has(sl_attrs, "sl-skip"))
-            wrap_with_element(code, element, el_attrs, "s();");
+            wrap_with_element(code, element, key, el_attrs, "s();");
         else if (_.has(sl_attrs, "sl-text"))
-            wrap_with_element(code, element, el_attrs,
+            wrap_with_element(code, element, key, el_attrs,
                               `t(${sl_attrs["sl-text"]});`);
         else if (_.isEmpty(element.childNodes))
-            void_element(code, element, el_attrs);
+            void_element(code, element, key, el_attrs);
         else {
-            open_element(code, element, el_attrs);
+            open_element(code, element, key, el_attrs);
             compile_nodes(vars, code, _.toArray(element.childNodes));
             close_element(code, element);
         }
@@ -119,12 +135,12 @@
     };
 
 
-    const void_element = (code, el, attrs) => vo_element("v", code, el, attrs);
-    const open_element = (code, el, attrs) => vo_element("o", code, el, attrs);
-    const vo_element = (func, code, el, attrs) => {
-        code.push(`${func}(${tag_name(el)}`)
+    const void_element = (code, el, key, attrs) => vo_element("v", code, el, key, attrs);
+    const open_element = (code, el, key, attrs) => vo_element("o", code, el, key, attrs);
+    const vo_element = (func, code, el, key, attrs) => {
+        code.push(`${func}(${tag_name(el)},${key}`);
         if (_.keys(attrs).length > 0)
-            code.push(",null,null");
+            code.push(",null");
         _.each(attrs, (value, name) => code.push(`,${escape_string(name)},${escape_string(value)}`));
         code.push(");");
     };
@@ -135,8 +151,8 @@
     };
 
 
-    const wrap_with_element = (code, el, attrs, wrapped) => {
-        open_element(code, el, attrs);
+    const wrap_with_element = (code, el, key, attrs, wrapped) => {
+        open_element(code, el, key, attrs);
         code.push(wrapped);
         close_element(code, el);
     };
