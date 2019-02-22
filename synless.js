@@ -37,7 +37,10 @@
                       "o=IncrementalDOM.elementOpen",
                       "c=IncrementalDOM.elementClose",
                       "v=IncrementalDOM.elementVoid",
-                      "s=IncrementalDOM.skip"];
+                      "s=IncrementalDOM.skip",
+                      "a=IncrementalDOM.attributes",
+                      "aa=IncrementalDOM.applyAttr",
+                      "ap=IncrementalDOM.applyProp"];
         const hoisted = {};
         const code = [];
 
@@ -76,7 +79,7 @@
 
 
     const compile_element = (vars, hoisted, code, element) => {
-        const [sl_attrs, el_attrs, attrs] = get_attrs(element);
+        const [sl_attrs, el_attrs, attrs, as_props] = get_attrs(element);
         let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : escape_string(unique_id("k"));
         const hoist_var = hoist_attributes(vars, hoisted, el_attrs);
 
@@ -102,14 +105,14 @@
             code.push("else{");
 
         if (_.has(sl_attrs, "sl-skip"))
-            wrap_with_element(code, element, key, hoist_var, attrs, "s();");
+            wrap_with_element(code, element, key, hoist_var, attrs, as_props, "s();");
         else if (_.has(sl_attrs, "sl-text"))
-            wrap_with_element(code, element, key, hoist_var, attrs,
+            wrap_with_element(code, element, key, hoist_var, attrs, as_props,
                               `t(${sl_attrs["sl-text"]});`);
         else if (_.isEmpty(element.childNodes))
-            void_element(code, element, key, hoist_var, attrs);
+            void_element(code, element, key, hoist_var, attrs, as_props);
         else {
-            open_element(code, element, key, hoist_var, attrs);
+            open_element(code, element, key, hoist_var, attrs, as_props);
             compile_nodes(vars, hoisted, code, _.toArray(element.childNodes));
             close_element(code, element);
         }
@@ -126,9 +129,14 @@
 
     const sl_pattern = /^sl-/;
     const attr_pattern = /^sl-attr:/;
+    const prop_pattern = /^sl-prop:/;
     const get_attrs = element => {
-        const sl = {}, el = {}, attrs = {};
+        const sl = {}, el = {}, attrs = {}, as_props = [];
         _.each(element.attributes, attr => {
+            if (prop_pattern.test(attr.nodeName)) {
+                as_props.push(attr.nodeName.replace(prop_pattern, ""));
+                attrs[attr.nodeName.replace(prop_pattern, "")] = attr.nodeValue;
+            }
             if (attr_pattern.test(attr.nodeName))
                 attrs[attr.nodeName.replace(attr_pattern, "")] = attr.nodeValue;
             else if (sl_pattern.test(attr.nodeName))
@@ -136,18 +144,20 @@
             else
                 el[attr.nodeName] = attr.nodeValue;
         });
-        return [sl, el, attrs];
+        return [sl, el, attrs, as_props];
     };
 
 
-    const vo_element = (func, code, el, key, hoist, attrs) => {
     const void_element = (...args) => vo_element("v", ...args);
     const open_element = (...args) => vo_element("o", ...args);
+    const vo_element = (func, code, el, key, hoist, attrs, as_props) => {
+        _.each(as_props, prop => code.push(`a[${escape_string(prop)}]=ap;`));
         code.push(`${func}(${tag_name(el)},${key}`);
         if (hoist != "null" || _.keys(attrs).length > 0)
             code.push(`,${hoist}`);
         _.each(attrs, (value, name) => code.push(`,${escape_string(name)},${value}`));
         code.push(");");
+        _.each(as_props, prop => code.push(`a[${escape_string(prop)}]=aa;`));
     };
 
 
@@ -156,8 +166,8 @@
     };
 
 
-    const wrap_with_element = (code, el, key, hoist, attrs, wrapped) => {
-        open_element(code, el, key, hoist, attrs);
+    const wrap_with_element = (code, el, key, hoist, attrs, as_props, wrapped) => {
+        open_element(code, el, key, hoist, attrs, as_props);
         code.push(wrapped);
         close_element(code, el);
     };

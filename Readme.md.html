@@ -116,6 +116,14 @@ are set as attributes.
 <a sl-attr:href="data.url" sl-attr:onclick="data.function_callback" sl-text="data.name"></a>
 ~~~
 
+To force a value to be set as a property, use `sl-prop:*`. This is useful for boolean attributes
+like `checked` and `disabled` where any attribute value would be considered true. They must be set
+as properties to work correctly.
+
+~~~HTML
+<input type="checkbox" sl-prop:checked="data.is_checked">
+~~~
+
 
 ### Special Case: Style
 
