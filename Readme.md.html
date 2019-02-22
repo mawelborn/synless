@@ -7,6 +7,27 @@ Explanatory Blurb.
 API
 ===
 
+Synless.template(template[, options]) => Function(element, data)
+----------------------------------------------------------------
+
+Compile the `template` representation using `options` to a function that patches an element using
+IncrementalDOM.
+
+~~~JavaScript
+var template = Synless.template(html_or_dom, options);
+template(element, data);
+~~~
+
+This is merly a convenience wrapper around `Synless.compile`:
+
+~~~JavaScript
+Synless.template = (nodes, options) => {
+    const render = Synless.compile(nodes, options);
+    return (el, data) => IncrementalDOM.patch(el, render, data);
+};
+~~~
+
+
 Synless.compile(template[, options]) => Function
 ------------------------------------------------
 

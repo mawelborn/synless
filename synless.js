@@ -1,4 +1,4 @@
-/* global define, exports, require, self, document, NodeList, HTMLCollection */
+/* global define, exports, require, self, document, NodeList, HTMLCollection, IncrementalDOM */
 ((root, factory) => {
     if (typeof define === "function" && define.amd)
         define(["exports", "underscore"], factory);
@@ -15,6 +15,10 @@
         return wrapper.childNodes;
     };
 
+    Synless.template = (nodes, options) => {
+        const render = Synless.compile(nodes, options);
+        return (el, data) => IncrementalDOM.patch(el, render, data);
+    };
     Synless.compile = (nodes, options) => (new Function(renderer_for(nodes, options)))();
     Synless.precompile = (nodes, options) => `!function(){${renderer_for(nodes, options)}}();`;
     Synless.options = {variable: "data"};
