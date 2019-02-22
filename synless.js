@@ -140,9 +140,9 @@
     };
 
 
-    const void_element = (code, el, key, hoist, attrs) => vo_element("v", code, el, key, hoist, attrs);
-    const open_element = (code, el, key, hoist, attrs) => vo_element("o", code, el, key, hoist, attrs);
     const vo_element = (func, code, el, key, hoist, attrs) => {
+    const void_element = (...args) => vo_element("v", ...args);
+    const open_element = (...args) => vo_element("o", ...args);
         code.push(`${func}(${tag_name(el)},${key}`);
         if (hoist != "null" || _.keys(attrs).length > 0)
             code.push(`,${hoist}`);
