@@ -54,6 +54,9 @@ QUnit.test("Attributes", assert => {
     assert.equal(Synless.precompile(`<input type="text" class="form-control" value="something"><input type="text" class="form-control">`),
                  `!function(){var t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a0=["class","form-control","type","text","value","something"],a1=["class","form-control","type","text"];return function(data){v("input","k0",a0);v("input","k1",a1);};}();`,
                  "Differentiate Hoisted");
+    assert.equal(Synless.compile(`<input type="text" sl-attr:value="data.name">`).toString(),
+                 `function(data){v("input","k0",a0,"value",data.name);}`,
+                 "Bound Attribute");
 });
 
 QUnit.test("Control Statements", assert => {

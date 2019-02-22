@@ -76,8 +76,7 @@
 
 
     const compile_element = (vars, hoisted, code, element) => {
-        const [sl_attrs, el_attrs] = get_attrs(element);
-        let attrs = {};
+        const [sl_attrs, el_attrs, attrs] = get_attrs(element);
         let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : escape_string(unique_id("k"));
         const hoist_var = hoist_attributes(vars, hoisted, el_attrs);
 
@@ -126,15 +125,18 @@
 
 
     const sl_pattern = /^sl-/;
+    const attr_pattern = /^sl-attr:/;
     const get_attrs = element => {
-        const sl = {}, el = {};
+        const sl = {}, el = {}, attrs = {};
         _.each(element.attributes, attr => {
-            if (sl_pattern.test(attr.nodeName))
+            if (attr_pattern.test(attr.nodeName))
+                attrs[attr.nodeName.replace(attr_pattern, "")] = attr.nodeValue;
+            else if (sl_pattern.test(attr.nodeName))
                 sl[attr.nodeName] = attr.nodeValue;
             else
                 el[attr.nodeName] = attr.nodeValue;
         });
-        return [sl, el];
+        return [sl, el, attrs];
     };
 
 
@@ -144,7 +146,7 @@
         code.push(`${func}(${tag_name(el)},${key}`);
         if (hoist != "null" || _.keys(attrs).length > 0)
             code.push(`,${hoist}`);
-        _.each(attrs, (value, name) => code.push(`,${escape_string(name)},${escape_string(value)}`));
+        _.each(attrs, (value, name) => code.push(`,${escape_string(name)},${value}`));
         code.push(");");
     };
 

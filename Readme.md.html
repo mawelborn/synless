@@ -104,6 +104,44 @@ elementClose("span");
 ~~~
 
 
+Attributes and Properties
+-------------------------
+
+Use `sl-attr:*` to bind dynamic values to an element attribute or property. The attribute to bind
+comes after the colon. Values can be any valid JavaScript expression. Values are set as an attribute
+or property based on their type. Objects and Functions are set as properties, and all other types
+are set as attributes.
+
+~~~HTML
+<a sl-attr:href="data.url" sl-attr:onclick="data.function_callback" sl-text="data.name"></a>
+~~~
+
+
+### Special Case: Style
+
+The style attribute can be set using a string or an object. A string style value should be written
+as it normally would in HTML. An object style value should use camelCase keys as would be used if
+working with `el.style` in JavaScript.
+
+~~~HTML
+<div sl-attr:style="data.div_style"></div>
+~~~
+
+Given the above, the following would be equivalent values for `div_style`:
+
+~~~JavaScript
+"margin: 0; padding-left: 10px; font-size: 1.5em;"
+~~~
+
+~~~JavaScript
+{
+    margin: 0,
+    paddingLeft: "10px",
+    fontSize: "1.5em"
+}
+~~~
+
+
 Control Directives
 ==================
 
