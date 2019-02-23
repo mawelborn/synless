@@ -1,7 +1,7 @@
 Synless Templates
 =================
 
-Explanatory Blurb.
+Templates that commit no sins.
 
 
 API
@@ -13,19 +13,19 @@ Synless.template(template[, options]) => Function(element, data)
 Compile the `template` representation using `options` to a function that patches an element using
 IncrementalDOM.
 
-~~~JavaScript
+```JavaScript
 var template = Synless.template(html_or_dom, options);
 template(element, data);
-~~~
+```
 
 This is merly a convenience wrapper around `Synless.compile`:
 
-~~~JavaScript
+```JavaScript
 Synless.template = (nodes, options) => {
     const render = Synless.compile(nodes, options);
     return (el, data) => IncrementalDOM.patch(el, render, data);
 };
-~~~
+```
 
 
 Synless.compile(template[, options]) => Function
@@ -36,13 +36,13 @@ an HTML string or object (including arrays of objects) that conform to the DOM s
 entire `Document`s, `DocumentFragment`s, `Node`s, `NodeList`s, and `HTMLCollection`s. The following
 are all valid uses:
 
-~~~JavaScript
+```JavaScript
 var render_function = Synless.compile("<p>HTML String</p>");
 render_function = Synless.compile(document.getElementById("template"));
 render_function = Synless.compile(document.body.childNodes);
 render_function = Synless.compile(document.querySelectorAll("p"));
 IncrementalDOM.patch(document.body, render_function, [...users]);
-~~~
+```
 
 
 Synless.precompile(template[, options]) => String
@@ -52,9 +52,9 @@ Compile the `template` representation using `options` to a JavaScript IIFE that 
 render function. This can be used to precompile templates server-side. `template` can be an HTML
 string or an object (or array of objects) that conform to the Document Object Model spec.
 
-~~~JavaScript
+```JavaScript
 fs.writeFileSync("template.js", "var template = " + Synless.precompile("<p>HTML String</p>"));
-~~~
+```
 
 
 Configuration
@@ -67,18 +67,11 @@ Specify template options for compilation globally using `Synless.options` or per
 `options` parameter to `Synless.template`, `Synless.compile`, and `Synless.precompile`. Compilation
 options are:
 
-variable
-:   The name of the variable that data passed to the render function will be assigned to.
-    Default: data
-collapse
-:   Collapse adjacent whitespace into a single space.
-    This will not affect element layout or spacing.
-    Default: true
-strip
-:   Trim whitespace from the beginning and end of text nodes.
-    If a stripped text node is empty, it will be omitted from the template entirely.
-    This can affect element layout and spacing of inline elements.
-    Default: false
+Option|Description
+------|-----------
+variable|The name of the variable that data passed to the render function will be assigned to.<br>Default: data
+collapse|Collapse adjacent whitespace into a single space.<br>This will not affect element layout or spacing.<br>Default: true
+strip|Trim whitespace from the beginning and end of text nodes.<br>If a stripped text node is empty, it will be omitted from the template entirely.<br>This can affect element layout and spacing of inline elements.<br>Default: false
 
 
 DOM Parser
@@ -92,13 +85,13 @@ If used in a non-browser environment, `dom_parser` should be overwritten with a 
 an HTML string and returns a list of `Node`s for the string. Synless supports HTML strings with
 multiple root elements, and any `dom_parser` replacement should do the same.
 
-~~~JavaScript
+```JavaScript
 Synless.dom_parser = html_string => {
     let wrapper = document.createElement("div");
     wrapper.innerHTML = html_string;
     return wrapper.childNodes;
 };
-~~~
+```
 
 
 Attributes, Properties, Text, and HTML
@@ -111,16 +104,16 @@ Use the `sl-text` directive to specify the text content of the element it's foun
 should not have any child nodes. If it does, they will be ignored and replaced with the specified
 text content. The value of `sl-text` can be any valid JavaScript expression.
 
-~~~HTML
+```HTML
 <span sl-text="data.name"></span>
 <span sl-text="Date.now()"></span>
 <span sl-text="backbone_model.get('title')"></span>
 <span sl-text="1+2">Existing child nodes are discarded.</span>
-~~~
+```
 
 Would compile to:
 
-~~~JavaScript
+```JavaScript
 elementOpen("span");
     text(data.name);
 elementClose("span");
@@ -133,7 +126,7 @@ elementClose("span");
 elementOpen("span");
     text(1+2);
 elementClose("span");
-~~~
+```
 
 
 Attributes and Properties
@@ -144,17 +137,17 @@ comes after the colon. Values can be any valid JavaScript expression. Values are
 or property based on their type. Objects and Functions are set as properties, and all other types
 are set as attributes.
 
-~~~HTML
+```HTML
 <a sl-attr:href="data.url" sl-attr:onclick="data.function_callback" sl-text="data.name"></a>
-~~~
+```
 
 To force a value to be set as a property, use `sl-prop:*`. This is useful for boolean attributes
 like `checked` and `disabled` where any attribute value would be considered true. They must be set
 as properties to work correctly.
 
-~~~HTML
+```HTML
 <input type="checkbox" sl-prop:checked="data.is_checked">
-~~~
+```
 
 
 ### Special Case: Style
@@ -163,23 +156,23 @@ The style attribute can be set using a string or an object. A string style value
 as it normally would in HTML. An object style value should use camelCase keys as would be used if
 working with `el.style` in JavaScript.
 
-~~~HTML
+```HTML
 <div sl-attr:style="data.div_style"></div>
-~~~
+```
 
 Given the above, the following would be equivalent values for `div_style`:
 
-~~~JavaScript
+```JavaScript
 "margin: 0; padding-left: 10px; font-size: 1.5em;"
-~~~
+```
 
-~~~JavaScript
+```JavaScript
 {
     margin: 0,
     paddingLeft: "10px",
     fontSize: "1.5em"
 }
-~~~
+```
 
 
 ### Special Case: Class
@@ -188,38 +181,38 @@ The class attribute can be set using a string, array, or object. A string value 
 as it normally would in HTML. An array of class names will be combined into a class list. An object
 will be converted to a class list by including keys in the list whose values are truthy.
 
-~~~HTML
+```HTML
 <ul class="list">
     <li sl-attr:style="data.classes"></li>
 </ul>
-~~~
+```
 
 Given the above, the following would be equivalent:
 
-~~~JavasScript
+```JavasScript
 "list-item selected"
-~~~
+```
 
-~~~JavasScript
+```JavasScript
 ["list-item", "selected"]
-~~~
+```
 
-~~~JavasScript
+```JavasScript
 {
     "list-item": true,
     "selected": true,
     "another-class": false
 }
-~~~
+```
 
 The value can be any JavaScript expression that evaluates to a string, array, or object. Inline
 objects are good way to toggle classes based on data properties:
 
-~~~HTML
+```HTML
 <ul>
     <li sl-attr:style="{'list-item': true, 'selected': data.is_selected}"></li>
 </ul>
-~~~
+```
 
 
 Control Directives
@@ -236,19 +229,19 @@ is found on. This is useful for when something else manages an element's childre
 for the Views of a Backbone Collection. Incremental DOM will create and manage attributes for the
 element that this directive is found on.
 
-~~~HTML
+```HTML
 <div id="container" sl-skip>
     ... Subtree items are not patched by IDOM ...
 </div>
-~~~
+```
 
 Would compile to:
 
-~~~JavaScript
+```JavaScript
 elementOpen("div", null, null, "id", "container");
 skip();
 elementClose("div");
-~~~
+```
 
 
 Each
@@ -257,17 +250,17 @@ Each
 Use `sl-each` to repeat an element once for value in an array or object. Specify the name of the
 iterable, followed by a colon, followed by the name to assign the value to in each iteration.
 
-~~~HTML
+```HTML
 <ul>
     <li sl-each="data.list_items:item">
         <a sl-attr:href="item.url" sl-text="item.name"></a>
     </li>
 </ul>
-~~~
+```
 
 Is equivalent to:
 
-~~~Mustache
+```Mustache
 <ul>
     {{#list_items}}
     <li>
@@ -275,11 +268,11 @@ Is equivalent to:
     </li>
     {{/list_items}}
 </ul>
-~~~
+```
 
 And would compile to:
 
-~~~JavaScript
+```JavaScript
 elementOpen("ul");
 _.each(data.list_items, function(item) {
     elementOpen("li");
@@ -289,7 +282,7 @@ _.each(data.list_items, function(item) {
     elementClose("li");
 });
 elementClose("ul");
-~~~
+```
 
 
 Key
@@ -305,13 +298,13 @@ every element, and inside loops it uses the loop index as a part of the composit
 key for loop elements allows you to use some other attribute of the iterated data to determine
 uniqueness.
 
-~~~HTML
+```HTML
 <ul>
     <li sl-each="data.items:item" sl-key="item.id">
         <input type="text" placeholder="Name" sl-prop:value="item.name">
     </li>
 </ul>
-~~~
+```
 
 
 If, Else If, Else
@@ -321,18 +314,18 @@ Use `sl-if`, `sl-elif`, and `sl-else` to conditionally render an element. The va
 `sl-elif` is placed in the corresponding JavaScript conditional and supports any valid JavaScript
 expression.
 
-~~~HTML
+```HTML
 <p sl-if="data.logged_in">
     Hello, <span sl-text="data.user_name"></span>!
 </p>
 <p sl-else>
     Hello, stranger!
 </p>
-~~~
+```
 
 Is equivalent to:
 
-~~~Mustache
+```Mustache
 {{#logged_in}}
 <p>
     Hello, {{user_name}}!
@@ -343,11 +336,11 @@ Is equivalent to:
     Hello, stranger!
 </p>
 {{/logged_in}}
-~~~
+```
 
 And would compile to:
 
-~~~JavaScript
+```JavaScript
 if (data.logged_in) {
     elementOpen("p");
         text("Hello, ");
@@ -362,22 +355,22 @@ else {
         text("Hello, stranger!");
     elementClose("p");
 }
-~~~
+```
 
 Iteration has higher precedence than conditionals, which allows compact representations like the
 following:
 
-~~~HTML
+```HTML
 <ul>
     <li sl-each="data.list_items:item"
         sl-if="!item.hidden"
         sl-text="item.name"></li>
 </ul>
-~~~
+```
 
 Which is equivalent to:
 
-~~~Mustache
+```Mustache
 <ul>
     {{#list_items}}
     {{^hidden}}
@@ -385,11 +378,11 @@ Which is equivalent to:
     {{/hidden}}
     {{/list_items}}
 </ul>
-~~~
+```
 
 And compiles to:
 
-~~~JavaScript
+```JavaScript
 elementOpen("ul");
 _.each(data.list_items, function(item) {
     if (!item.hidden) {
@@ -399,7 +392,7 @@ _.each(data.list_items, function(item) {
     }
 });
 elementClose("ul");
-~~~
+```
 
 
 Empty
@@ -409,18 +402,18 @@ Empty
 specifying something to be displayed if a value is falsey (including empty arrays and objects).
 
 
-~~~HTML
+```HTML
 <ul>
     <li sl-each="data.list_items:item">
         <a sl-attr:href="item.url" sl-text="item.name"></a>
     </li>
     <li sl-empty="data.list_items">No Items</li>
 </ul>
-~~~
+```
 
 Is equivalent to:
 
-~~~Mustache
+```Mustache
 <ul>
     {{#list_items}}
     <li>
@@ -431,11 +424,11 @@ Is equivalent to:
     <li>No Items</li>
     {{/list_items}}
 </ul>
-~~~
+```
 
 And would compile to:
 
-~~~JavaScript
+```JavaScript
 elementOpen("ul");
 _.each(data.list_items, function(item) {
     elementOpen("li");
@@ -450,8 +443,4 @@ if (!(data.list_items) || _.isEmpty(data.list_items)) {
     elementClose("li");
 }
 elementClose("ul");
-~~~
-
-
-<style>body { font-family: sans; }</style>
-<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+```
