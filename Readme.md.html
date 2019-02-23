@@ -182,6 +182,46 @@ Given the above, the following would be equivalent values for `div_style`:
 ~~~
 
 
+### Special Case: Class
+
+The class attribute can be set using a string, array, or object. A string value should be written
+as it normally would in HTML. An array of class names will be combined into a class list. An object
+will be converted to a class list by including keys in the list whose values are truthy.
+
+~~~HTML
+<ul class="list">
+    <li sl-attr:style="data.classes"></li>
+</ul>
+~~~
+
+Given the above, the following would be equivalent:
+
+~~~JavasScript
+"list-item selected"
+~~~
+
+~~~JavasScript
+["list-item", "selected"]
+~~~
+
+~~~JavasScript
+{
+    "list-item": true,
+    "selected": true,
+    "another-class": false
+}
+~~~
+
+The value can be any JavaScript expression that evaluates to a string, array, or object. Inline
+objects are good way to toggle classes based on data properties:
+
+~~~HTML
+<ul>
+    <li sl-attr:style="{'list-item': true, 'selected': data.is_selected}"></li>
+</ul>
+~~~
+
+
 Control Directives
 ==================
 

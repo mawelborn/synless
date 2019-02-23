@@ -28,7 +28,9 @@
     const renderer_for = (nodes, options) => {
         opts = _.extend({}, Synless.options, options);
         counters = {};
-        vars = ["t=IncrementalDOM.text",
+        vars = ["cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));"
+                     + "_.isArray(c)&&(c=c.join(\" \"));return c;}",
+                "t=IncrementalDOM.text",
                 "o=IncrementalDOM.elementOpen",
                 "c=IncrementalDOM.elementClose",
                 "v=IncrementalDOM.elementVoid",
@@ -102,6 +104,9 @@
             key = `${index}+${key}`;
             code.push(`_.each(${iterator},function(${iteratee},${index},${rest.join(",")}){`);
         }
+
+        if (_.has(attrs, "class"))
+            attrs["class"] = `cls(${attrs["class"]})`;
 
         if (_.has(sl_attrs, "sl-empty"))
             sl_attrs["sl-if"] = `!(${sl_attrs["sl-empty"]})||_.isEmpty(${sl_attrs["sl-empty"]})`;
