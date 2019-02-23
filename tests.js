@@ -2,9 +2,29 @@
 
 QUnit.test("Compilation", assert => {
     assert.equal(Synless.compile(), `function(data){}`);
-    assert.equal(Synless.compile(null, {variable: "template"}), `function(template){}`);
     const precompiled = `!function(){var t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp;return function(data){};}();`;
     assert.equal(Synless.precompile(), precompiled);
+});
+
+QUnit.test("Configuration", assert => {
+    assert.equal(Synless.compile(null, {variable: "template"}).toString(),
+                 `function(template){}`,
+                 "Variable");
+    assert.equal(Synless.compile(" \t ").toString(),
+                 `function(data){t(" ");}`,
+                 "Collapse");
+    assert.equal(Synless.compile("  <div> \t String \t\t\t Thing \t <div />  </div>  ").toString(),
+                 `function(data){t(" ");o("div","k0");t(" String Thing ");o("div","k1");t(" ");c("div");t(" ");c("div");}`,
+                 "Collapse");
+    assert.equal(Synless.compile("  <div> \t String \t\t\t Thing \t <div />  </div>  ", {collapse: false}).toString(),
+                 `function(data){t("  ");o("div","k0");t(" \\t String \\t\\t\\t Thing \\t ");o("div","k1");t("  ");c("div");t("  ");c("div");}`,
+                 "No Collapse");
+    assert.equal(Synless.compile("  <div> \t String \t\t\t Thing \t <div />  </div>  ", {strip: true}).toString(),
+                 `function(data){o("div","k0");t("String Thing");o("div","k1");c("div");c("div");}`,
+                 "Strip");
+    assert.equal(Synless.compile("  <div> \t String \t\t\t Thing \t <div />  </div>  ", {collapse: false, strip: true}).toString(),
+                 `function(data){o("div","k0");t("String \\t\\t\\t Thing");o("div","k1");c("div");c("div");}`,
+                 "Strip, No Collapse");
 });
 
 QUnit.test("String vs DOM input", assert => {

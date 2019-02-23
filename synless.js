@@ -8,7 +8,9 @@
         factory(root.Synless = {}, root._);
 })(typeof self !== "undefined" ? self : this, (Synless, _) => {
     Synless.VERSION = "0.1.0";
-    Synless.options = {variable: "data"};
+    Synless.options = {variable: "data",
+                       collapse: true,
+                       strip: false};
     Synless.compile = (nodes, options) => (new Function(renderer_for(nodes, options)))();
     Synless.precompile = (nodes, options) => `!function(){${renderer_for(nodes, options)}}();`;
     Synless.template = (nodes, options) => {
@@ -59,10 +61,27 @@
         if (node.nodeType == 9)
             node == node.documentElement;
         if (node.nodeType == 3)
-            code.push("t(" + escape(node.nodeValue) + ");");
+            compile_text(node);
         if (node.nodeType == 1)
             compile_element(node);
     });
+
+
+    const compile_text = node => {
+        let text = compress(node.nodeValue);
+        if (!opts.strip || text.length > 0)
+            code.push("t(" + escape(text) + ");");
+    };
+
+
+    const whitespace_pattern = /\s+/g;
+    const compress = text => {
+        if (opts.collapse)
+            text = text.replace(whitespace_pattern, " ");
+        if (opts.strip)
+            text = text.trim();
+        return text;
+    };
 
 
     const compile_element = element => {

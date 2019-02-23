@@ -64,10 +64,21 @@ Options
 -------
 
 Specify template options for compilation globally using `Synless.options` or per template using the
-`options` parameter to `Synless.compile` and `Synless.precompile`. Compilation options are:
+`options` parameter to `Synless.template`, `Synless.compile`, and `Synless.precompile`. Compilation
+options are:
 
 variable
-:   The name of the variable that data passed to the render function will be assigned to. Default: data
+:   The name of the variable that data passed to the render function will be assigned to.
+    Default: data
+collapse
+:   Collapse adjacent whitespace into a single space.
+    This will not affect element layout or spacing.
+    Default: true
+strip
+:   Trim whitespace from the beginning and end of text nodes.
+    If a stripped text node is empty, it will be omitted from the template entirely.
+    This can affect element layout and spacing of inline elements.
+    Default: false
 
 
 DOM Parser
