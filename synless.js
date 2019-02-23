@@ -33,25 +33,25 @@
     const unique_id = prefix => "" + prefix + increment_counter(prefix);
 
 
+    let opts = {}, vars = [], hoisted = {}, code = [];
     const renderer_for = (nodes, options) => {
-        options = _.extend({}, Synless.options, options);
+        opts = _.extend({}, Synless.options, options);
         counters = {};
-
-        const vars = ["t=IncrementalDOM.text",
-                      "o=IncrementalDOM.elementOpen",
-                      "c=IncrementalDOM.elementClose",
-                      "v=IncrementalDOM.elementVoid",
-                      "s=IncrementalDOM.skip",
-                      "a=IncrementalDOM.attributes",
-                      "aa=IncrementalDOM.applyAttr",
-                      "ap=IncrementalDOM.applyProp"];
-        const hoisted = {};
-        const code = [];
+        vars = ["t=IncrementalDOM.text",
+                "o=IncrementalDOM.elementOpen",
+                "c=IncrementalDOM.elementClose",
+                "v=IncrementalDOM.elementVoid",
+                "s=IncrementalDOM.skip",
+                "a=IncrementalDOM.attributes",
+                "aa=IncrementalDOM.applyAttr",
+                "ap=IncrementalDOM.applyProp"];
+        hoisted = {};
+        code = [];
 
         nodes = prepare_nodes(nodes);
-        compile_nodes(vars, hoisted, code, nodes);
+        compile_nodes(nodes);
 
-        return `var ${vars.join(",")};return function(${options.variable}){${code.join("")}};`;
+        return `var ${vars.join(",")};return function(${opts.variable}){${code.join("")}};`;
     };
 
 
@@ -72,20 +72,20 @@
     };
 
 
-    const compile_nodes = (vars, hoisted, code, nodes) => _.each(nodes, node => {
+    const compile_nodes = nodes => _.each(nodes, node => {
         if (node.nodeType == 9)
             node == node.documentElement;
         if (node.nodeType == 3)
             code.push("t(" + escape_string(node.nodeValue) + ");");
         if (node.nodeType == 1)
-            compile_element(vars, hoisted, code, node);
+            compile_element(node);
     });
 
 
-    const compile_element = (vars, hoisted, code, element) => {
+    const compile_element = element => {
         const [sl_attrs, el_attrs, attrs, as_props] = get_attrs(element);
         let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : escape_string(unique_id("k"));
-        const hoist_var = hoist_attributes(vars, hoisted, el_attrs);
+        const hoist_var = hoist_attributes(el_attrs);
 
         if (_.has(sl_attrs, "sl-each")) {
             let iterator, iteratee, index, rest;
@@ -109,16 +109,16 @@
             code.push("else{");
 
         if (_.has(sl_attrs, "sl-skip"))
-            wrap_with_element(code, element, key, hoist_var, attrs, as_props, "s();");
+            wrap_with_element(element, key, hoist_var, attrs, as_props, "s();");
         else if (_.has(sl_attrs, "sl-text"))
-            wrap_with_element(code, element, key, hoist_var, attrs, as_props,
+            wrap_with_element(element, key, hoist_var, attrs, as_props,
                               `t(${sl_attrs["sl-text"]});`);
         else if (_.isEmpty(element.childNodes))
-            void_element(code, element, key, hoist_var, attrs, as_props);
+            void_element(element, key, hoist_var, attrs, as_props);
         else {
-            open_element(code, element, key, hoist_var, attrs, as_props);
-            compile_nodes(vars, hoisted, code, _.toArray(element.childNodes));
-            close_element(code, element);
+            open_element(element, key, hoist_var, attrs, as_props);
+            compile_nodes(_.toArray(element.childNodes));
+            close_element(element);
         }
 
         if (_.has(sl_attrs, "sl-if")
@@ -154,7 +154,7 @@
 
     const void_element = (...args) => vo_element("v", ...args);
     const open_element = (...args) => vo_element("o", ...args);
-    const vo_element = (func, code, el, key, hoist, attrs, as_props) => {
+    const vo_element = (func, el, key, hoist, attrs, as_props) => {
         _.each(as_props, prop => code.push(`a[${escape_string(prop)}]=ap;`));
         code.push(`${func}(${tag_name(el)},${key}`);
         if (hoist != "null" || _.keys(attrs).length > 0)
@@ -165,19 +165,19 @@
     };
 
 
-    const close_element = (code, el) => {
+    const close_element = el => {
         code.push("c(" + tag_name(el) + ");");
     };
 
 
-    const wrap_with_element = (code, el, key, hoist, attrs, as_props, wrapped) => {
-        open_element(code, el, key, hoist, attrs, as_props);
+    const wrap_with_element = (el, key, hoist, attrs, as_props, wrapped) => {
+        open_element(el, key, hoist, attrs, as_props);
         code.push(wrapped);
-        close_element(code, el);
+        close_element(el);
     };
 
 
-    const hoist_attributes = (vars, hoisted, attrs) => {
+    const hoist_attributes = attrs => {
         if (_.keys(attrs).length == 0)
             return "null";
         attrs = _.map(_.keys(attrs).sort(),
