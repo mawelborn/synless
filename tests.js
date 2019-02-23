@@ -122,4 +122,7 @@ QUnit.test("Control Statements", assert => {
     assert.equal(Synless.compile(`<div sl-each="data.items:item" sl-key="item.id"></div>`).toString(),
                  `function(data){_.each(data.items,function(item,_1,_2){v("div",_1+item.id);});}`,
                  "Each Key");
+    assert.equal(Synless.compile(`<div sl-empty="data.items" />`).toString(),
+                 `function(data){if(!(data.items)||_.isEmpty(data.items)){v("div","k0");}}`,
+                 "Empty");
 });

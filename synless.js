@@ -103,6 +103,9 @@
             code.push(`_.each(${iterator},function(${iteratee},${index},${rest.join(",")}){`);
         }
 
+        if (_.has(sl_attrs, "sl-empty"))
+            sl_attrs["sl-if"] = `!(${sl_attrs["sl-empty"]})||_.isEmpty(${sl_attrs["sl-empty"]})`;
+
         if (_.has(sl_attrs, "sl-if"))
             code.push(`if(${sl_attrs["sl-if"]}){`);
         else if (_.has(sl_attrs, "sl-elif"))

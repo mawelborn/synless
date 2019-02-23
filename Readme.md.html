@@ -362,5 +362,56 @@ elementClose("ul");
 ~~~
 
 
+Empty
+-----
+
+`sl-empty="condition"` is a shorthand for `sl-if="!(condition)||_.isEmpty(condition)"`. Useful for
+specifying something to be displayed if a value is falsey (including empty arrays and objects).
+
+
+~~~HTML
+<ul>
+    <li sl-each="data.list_items:item">
+        <a sl-attr:href="item.url" sl-text="item.name"></a>
+    </li>
+    <li sl-empty="data.list_items">No Items</li>
+</ul>
+~~~
+
+Is equivalent to:
+
+~~~Mustache
+<ul>
+    {{#list_items}}
+    <li>
+        <a href="{{url}}">{{name}}</a>
+    </li>
+    {{/list_items}}
+    {{^list_items}}
+    <li>No Items</li>
+    {{/list_items}}
+</ul>
+~~~
+
+And would compile to:
+
+~~~JavaScript
+elementOpen("ul");
+_.each(data.list_items, function(item) {
+    elementOpen("li");
+        elementOpen("a", null, null, "href", item.url);
+            text(item.name);
+        elementClose("a");
+    elementClose("li");
+});
+if (!(data.list_items) || _.isEmpty(data.list_items)) {
+    elementOpen("li");
+        text("No Items");
+    elementClose("li");
+}
+elementClose("ul");
+~~~
+
+
 <style>body { font-family: sans; }</style>
 <!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
