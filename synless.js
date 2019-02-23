@@ -8,32 +8,21 @@
         factory(root.Synless = {}, root._);
 })(typeof self !== "undefined" ? self : this, (Synless, _) => {
     Synless.VERSION = "0.1.0";
-
+    Synless.options = {variable: "data"};
+    Synless.compile = (nodes, options) => (new Function(renderer_for(nodes, options)))();
+    Synless.precompile = (nodes, options) => `!function(){${renderer_for(nodes, options)}}();`;
+    Synless.template = (nodes, options) => {
+        const render = Synless.compile(nodes, options);
+        return (el, data) => IncrementalDOM.patch(el, render, data);
+    };
     Synless.dom_parser = html_string => {
         let wrapper = document.createElement("div");
         wrapper.innerHTML = html_string;
         return wrapper.childNodes;
     };
 
-    Synless.template = (nodes, options) => {
-        const render = Synless.compile(nodes, options);
-        return (el, data) => IncrementalDOM.patch(el, render, data);
-    };
-    Synless.compile = (nodes, options) => (new Function(renderer_for(nodes, options)))();
-    Synless.precompile = (nodes, options) => `!function(){${renderer_for(nodes, options)}}();`;
-    Synless.options = {variable: "data"};
 
-
-    let counters = {};
-    const increment_counter = prefix => {
-        if (!_.has(counters, prefix))
-            counters[prefix] = 0;
-        return counters[prefix]++;
-    };
-    const unique_id = prefix => "" + prefix + increment_counter(prefix);
-
-
-    let opts = {}, vars = [], hoisted = {}, code = [];
+    let opts = {}, counters = {}, vars = [], hoisted = {}, code = [];
     const renderer_for = (nodes, options) => {
         opts = _.extend({}, Synless.options, options);
         counters = {};
@@ -47,10 +36,8 @@
                 "ap=IncrementalDOM.applyProp"];
         hoisted = {};
         code = [];
-
         nodes = prepare_nodes(nodes);
         compile_nodes(nodes);
-
         return `var ${vars.join(",")};return function(${opts.variable}){${code.join("")}};`;
     };
 
@@ -58,16 +45,12 @@
     const prepare_nodes = nodes => {
         if (_.isString(nodes))
             nodes = Synless.dom_parser(nodes);
-
         if (nodes instanceof NodeList || nodes instanceof HTMLCollection)
             nodes = _.toArray(nodes);
-
         if (_.isUndefined(nodes) || nodes === null)
             nodes = [];
-
         if (!_.isArray(nodes))
             nodes = [nodes];
-
         return nodes;
     };
 
@@ -76,7 +59,7 @@
         if (node.nodeType == 9)
             node == node.documentElement;
         if (node.nodeType == 3)
-            code.push("t(" + escape_string(node.nodeValue) + ");");
+            code.push("t(" + escape(node.nodeValue) + ");");
         if (node.nodeType == 1)
             compile_element(node);
     });
@@ -84,7 +67,7 @@
 
     const compile_element = element => {
         const [sl_attrs, el_attrs, attrs, as_props] = get_attrs(element);
-        let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : escape_string(unique_id("k"));
+        let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : escape(unique_id("k"));
         const hoist_var = hoist_attributes(el_attrs);
 
         if (_.has(sl_attrs, "sl-each")) {
@@ -155,13 +138,13 @@
     const void_element = (...args) => vo_element("v", ...args);
     const open_element = (...args) => vo_element("o", ...args);
     const vo_element = (func, el, key, hoist, attrs, as_props) => {
-        _.each(as_props, prop => code.push(`a[${escape_string(prop)}]=ap;`));
+        _.each(as_props, prop => code.push(`a[${escape(prop)}]=ap;`));
         code.push(`${func}(${tag_name(el)},${key}`);
         if (hoist != "null" || _.keys(attrs).length > 0)
             code.push(`,${hoist}`);
-        _.each(attrs, (value, name) => code.push(`,${escape_string(name)},${value}`));
+        _.each(attrs, (value, name) => code.push(`,${escape(name)},${value}`));
         code.push(");");
-        _.each(as_props, prop => code.push(`a[${escape_string(prop)}]=aa;`));
+        _.each(as_props, prop => code.push(`a[${escape(prop)}]=aa;`));
     };
 
 
@@ -180,8 +163,7 @@
     const hoist_attributes = attrs => {
         if (_.keys(attrs).length == 0)
             return "null";
-        attrs = _.map(_.keys(attrs).sort(),
-                      key => `${escape_string(key)},${escape_string(attrs[key])}`);
+        attrs = _.map(_.keys(attrs).sort(), key => `${escape(key)},${escape(attrs[key])}`);
         attrs = `[${attrs.join(",")}]`;
         if (_.has(hoisted, attrs))
             return hoisted[attrs];
@@ -194,18 +176,26 @@
     };
 
 
-    const tag_name = el => escape_string(el.nodeName.toLowerCase());
+    const tag_name = el => escape(el.nodeName.toLowerCase());
 
 
     const escapes = {"\n": "\\n",
                      "\r": "\\r",
                      "\t": "\\t",
                      "\"": "\\\""};
-    const escape_string = value => (
+    const escape = value => (
         "\""
         + _.reduce(_.pairs(escapes),
                    (value, [unescaped, escaped]) => value.split(unescaped).join(escaped),
                    value)
         + "\""
     );
+
+
+    const next_counter = prefix => {
+        if (!_.has(counters, prefix))
+            counters[prefix] = 0;
+        return counters[prefix]++;
+    };
+    const unique_id = prefix => "" + prefix + next_counter(prefix);
 });
