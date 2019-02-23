@@ -1,5 +1,6 @@
 /* global define, exports, require, self, document, NodeList, HTMLCollection, IncrementalDOM */
 ((root, factory) => {
+    "use strict";
     if (typeof define === "function" && define.amd)
         define(["exports", "underscore"], factory);
     else if (typeof exports !== "undefined")
@@ -7,6 +8,7 @@
     else
         factory(root.Synless = {}, root._);
 })(typeof self !== "undefined" ? self : this, (Synless, _) => {
+    "use strict";
     Synless.VERSION = "0.1.0";
     Synless.options = {variable: "data",
                        collapse: true,
