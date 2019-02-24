@@ -1,4 +1,4 @@
-/* global define, exports, require, self, document, NodeList, HTMLCollection, IncrementalDOM */
+/* global define, exports, require, self, document, DocumentFragment, NodeList, HTMLCollection, IncrementalDOM */
 ((root, factory) => {
     "use strict";
     if (typeof define === "function" && define.amd)
@@ -54,6 +54,8 @@
     const prepare_nodes = nodes => {
         if (_.isString(nodes))
             nodes = Synless.dom_parser(nodes);
+        if (nodes instanceof DocumentFragment)
+            nodes = nodes.childNodes;
         if (nodes instanceof NodeList || nodes instanceof HTMLCollection)
             nodes = _.toArray(nodes);
         if (_.isUndefined(nodes) || nodes === null)
