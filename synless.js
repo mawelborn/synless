@@ -73,8 +73,13 @@
 
     const compile_text = node => {
         let text = compress(node.nodeValue);
-        if (!opts.strip || text.length > 0)
-            code.push("t(" + escape(text) + ");");
+        if (!opts.strip || text.length > 0) {
+            let instruction = "t(" + escape(text) + ");";
+            if ((_.last(code) == "}" || _.last(code) == "});") && text.trim() == "")
+                code.splice(-1, 0, instruction);
+            else
+                code.push(instruction);
+        }
     };
 
 

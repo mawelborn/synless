@@ -128,4 +128,10 @@ QUnit.test("Control Statements", assert => {
     assert.equal(Synless.compile(`<div sl-empty="data.items" />`).toString(),
                  `function(data){if(!(data.items)||_.isEmpty(data.items)){v("div","k0");}}`,
                  "Empty");
+    assert.equal(Synless.compile(`<div sl-if="data.bold"></div> \t <div sl-else></div>`, {collapse: false}).toString(),
+                 `function(data){if(data.bold){v("div","k0");t(" \\t ");}else{v("div","k1");}}`,
+                 "Whitespace text binds to preceding conditional");
+    assert.equal(Synless.compile(`<div sl-each="data"></div> \t <div></div>`, {collapse: false}).toString(),
+                 `function(data){_.each(data,function(_0,_1,_2){v("div",_1+"k0");t(" \\t ");});v("div","k1");}`,
+                 "Whitespace text binds to preceding iterator");
 });
