@@ -29,7 +29,6 @@
     let opts = {}, counters = {}, vars = [], hoisted = {}, code = [];
     const renderer_for = (nodes, options) => {
         opts = _.extend({}, Synless.options, options);
-        counters = {};
         vars = ["cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));"
                      + "_.isArray(c)&&(c=c.join(\" \"));return c;}",
                 "t=IncrementalDOM.text",
@@ -40,11 +39,15 @@
                 "a=IncrementalDOM.attributes",
                 "aa=IncrementalDOM.applyAttr",
                 "ap=IncrementalDOM.applyProp"];
-        hoisted = {};
-        code = [];
         nodes = prepare_nodes(nodes);
         compile_nodes(nodes);
-        return `var ${vars.join(",")};return function(${opts.variable}){${code.join("")}};`;
+        let renderer = `var ${vars.join(",")};return function(${opts.variable}){${code.join("")}};`;
+        opts = {};
+        counters = {};
+        vars = [];
+        hoisted = {};
+        code = [];
+        return renderer;
     };
 
 
