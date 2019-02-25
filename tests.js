@@ -37,6 +37,21 @@ QUnit.test("String vs DOM input", assert => {
                  Synless.compile(nodes).toString());
 });
 
+QUnit.test("DOM Parser Edge Cases", assert => {
+    assert.equal(Synless.compile("<td>One</td><td>Two</td><td>Three</td>").toString(),
+                 `function(data){o("td","k0");t("One");c("td");o("td","k1");t("Two");c("td");o("td","k2");t("Three");c("td");}`,
+                 "Root TD element");
+    assert.equal(Synless.compile("<tr><td>One</td><td>Two</td><td>Three</td></tr>").toString(),
+                 `function(data){o("tr","k0");o("td","k1");t("One");c("td");o("td","k2");t("Two");c("td");o("td","k3");t("Three");c("td");c("tr");}`,
+                 "Root TR element");
+    assert.equal(Synless.compile("<option selected>One</option><option selected>Two</option><option>Three</option>").toString(),
+                 `function(data){o("option","k0",a0);t("One");c("option");o("option","k1",a0);t("Two");c("option");o("option","k2");t("Three");c("option");}`,
+                 "Root Option element");
+    assert.equal(Synless.compile("<li>One</li><li>Two</li><li>Three</li>").toString(),
+                 `function(data){o("li","k0");t("One");c("li");o("li","k1");t("Two");c("li");o("li","k2");t("Three");c("li");}`,
+                 "Root LI element");
+});
+
 QUnit.test("Elements", assert => {
     assert.equal(Synless.compile("<div />").toString(),
                  `function(data){v("div","k0");}`,

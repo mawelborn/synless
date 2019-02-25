@@ -19,8 +19,20 @@
         const render = Synless.compile(nodes, options);
         return (el, data) => IncrementalDOM.patch(el, render, data);
     };
+
+    const tag_name_pattern = /<(\w+)/;
+    const parent_for = {
+        "base": "head", "body": "html", "caption": "table", "col": "colgroup",
+        "colgroup": "table", "dd": "dl", "dt": "dl", "figcaption": "figure",
+        "head": "html", "legend": "fieldset", "li": "ul", "optgroup": "select",
+        "option": "select", "param": "object", "source": "video", "style": "head",
+        "summary": "details", "tbody": "table", "td": "tr", "tfoot": "table",
+        "th": "tr", "thead": "table", "title": "head", "tr": "tbody", "track": "video"
+    };
     Synless.dom_parser = html_string => {
-        let wrapper = document.createElement("div");
+        let tag_name = _.last(html_string.match(tag_name_pattern)) || "";
+        let parent_tag_name = parent_for[tag_name.toLowerCase()] || "div";
+        let wrapper = document.createElement(parent_tag_name);
         wrapper.innerHTML = html_string;
         return wrapper.childNodes;
     };

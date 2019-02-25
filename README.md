@@ -444,3 +444,14 @@ if (!(data.list_items) || _.isEmpty(data.list_items)) {
 }
 elementClose("ul");
 ```
+
+
+Browser Compatibility
+=====================
+Synless supports Chrome, Edge, Firefox, and IE10+.
+
+IE9 is supported with caveat that the certain HTML strings do not compile correctly in-browser. Root
+elements that have specific parent element requirements (td, option, etc.) are not preserved when
+converted to a DOM tree. `tbody.innerHTML = "<tr><td>One</<td><td>Two</td></tr>"` results in
+`TextNode("OneTwo")`. If you need to compile such templates in IE9, include the template in your
+HTML document, query the template Nodes, and pass them directly to `Synless.compile()`.
