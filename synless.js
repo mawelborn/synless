@@ -17,7 +17,9 @@
     Synless.precompile = (nodes, options) => `(function(){${renderer_for(nodes, options)}}())`;
     Synless.template = (nodes, options) => {
         const render = Synless.compile(nodes, options);
-        return (el, data) => IncrementalDOM.patch(el, render, data);
+        return function(el, data, context) {
+            return IncrementalDOM.patch(el, render.bind(context || this), data);
+        };
     };
 
     const tag_name_pattern = /<(\w+)/;
@@ -89,7 +91,7 @@
 
 
     const close_conditional = "}";
-    const close_iterator = "});";
+    const close_iterator = "},this);";
     const compile_text = node => {
         let text = compress(node.nodeValue);
         if (!opts.strip || text.length > 0) {

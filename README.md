@@ -7,11 +7,11 @@ Templates that commit no sins.
 API
 ===
 
-Synless.template(template[, options]) => Function(element, data)
-----------------------------------------------------------------
+Synless.template(template[, options]) => Function(element[, data[, context]])
+-----------------------------------------------------------------------------
 
 Compile the `template` representation using `options` to a function that patches an element using
-IncrementalDOM.
+IncrementalDOM. The optional `context` argument to the returned function sets the `this` argument.
 
 ```JavaScript
 var template = Synless.template(html_or_dom, options);
@@ -23,7 +23,9 @@ This is merly a convenience wrapper around `Synless.compile`:
 ```JavaScript
 Synless.template = (nodes, options) => {
     const render = Synless.compile(nodes, options);
-    return (el, data) => IncrementalDOM.patch(el, render, data);
+    return function(el, data, context) {
+        return IncrementalDOM.patch(el, render.bind(context || this), data);
+    };
 };
 ```
 
@@ -248,7 +250,8 @@ Each
 ----
 
 Use `sl-each` to repeat an element once for value in an array or object. Specify the name of the
-iterable, followed by a colon, followed by the name to assign the value to in each iteration.
+iterable, followed by a colon, followed by the name to assign the value to in each iteration. Each
+iteration inherits the `this` context argument from the containing scope.
 
 ```HTML
 <ul>
@@ -280,7 +283,7 @@ _.each(data.list_items, function(item) {
             text(item.name);
         elementClose("a");
     elementClose("li");
-});
+}, this);
 elementClose("ul");
 ```
 
