@@ -88,14 +88,17 @@
     });
 
 
+    const close_conditional = "}";
+    const close_iterator = "});";
     const compile_text = node => {
         let text = compress(node.nodeValue);
         if (!opts.strip || text.length > 0) {
             let instruction = "t(" + escape(text) + ");",
                 whitespace_text = text.trim() == "",
-                preceding_conditional = _.last(code) == "}",
-                preceding_iterator = _.last(code) == "});",
-                preceding_iterator_conditional = preceding_iterator && code[code.length - 2] == "}";
+                preceding_conditional = _.last(code) == close_conditional,
+                preceding_iterator = _.last(code) == close_iterator,
+                preceding_iterator_conditional = (preceding_iterator
+                                                  && code[code.length - 2] == close_conditional);
 
             if (whitespace_text && preceding_iterator_conditional)
                 code.splice(-2, 0, instruction);
@@ -165,10 +168,10 @@
         if (_.has(sl_attrs, "sl-if")
             || _.has(sl_attrs, "sl-elif")
             || _.has(sl_attrs, "sl-else"))
-            code.push("}");
+            code.push(close_conditional);
 
         if (_.has(sl_attrs, "sl-each"))
-            code.push("});");
+            code.push(close_iterator);
     };
 
 
