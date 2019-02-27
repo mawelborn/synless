@@ -1,12 +1,12 @@
 /* global QUnit Synless document */
-var closure_stripper = /.*;return |;}\(\);/gi;
+var closure_stripper = /.*;return |;}\(\)\)/gi;
 
 QUnit.test("Compilation", function (assert) {
     assert.equal(Synless.precompile().replace(closure_stripper, ""),
                  "function(data){}",
                  "Empty render function");
     assert.equal(Synless.precompile(),
-                 "!function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp;return function(data){};}();",
+                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp;return function(data){};}())",
                  "IIFE with hoisted attributes");
 });
 
@@ -86,13 +86,13 @@ QUnit.test("Attributes", function (assert) {
                  "function(data){v(\"input\",\"k0\",a0);}",
                  "Input type text, Disabled");
     assert.equal(Synless.precompile("<input type=\"text\" disabled>"),
-                 "!function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"disabled\",\"\",\"type\",\"text\"];return function(data){v(\"input\",\"k0\",a0);};}();",
+                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"disabled\",\"\",\"type\",\"text\"];return function(data){v(\"input\",\"k0\",a0);};}())",
                  "Hoisted Input type text, Disabled");
     assert.equal(Synless.precompile("<input type=\"text\" class=\"form-control\" value=\"something\"><input class=\"form-control\" value=\"something\" type=\"text\">"),
-                 "!function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"];return function(data){v(\"input\",\"k0\",a0);v(\"input\",\"k1\",a0);};}();",
+                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"];return function(data){v(\"input\",\"k0\",a0);v(\"input\",\"k1\",a0);};}())",
                  "Reuse Hoisted");
     assert.equal(Synless.precompile("<input type=\"text\" class=\"form-control\" value=\"something\"><input type=\"text\" class=\"form-control\">"),
-                 "!function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"],a1=[\"class\",\"form-control\",\"type\",\"text\"];return function(data){v(\"input\",\"k0\",a0);v(\"input\",\"k1\",a1);};}();",
+                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"],a1=[\"class\",\"form-control\",\"type\",\"text\"];return function(data){v(\"input\",\"k0\",a0);v(\"input\",\"k1\",a1);};}())",
                  "Differentiate Hoisted");
     assert.equal(Synless.precompile("<input type=\"text\" sl-attr:value=\"data.name\">").replace(closure_stripper, ""),
                  "function(data){v(\"input\",\"k0\",a0,\"value\",data.name);}",
