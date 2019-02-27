@@ -91,8 +91,15 @@
     const compile_text = node => {
         let text = compress(node.nodeValue);
         if (!opts.strip || text.length > 0) {
-            let instruction = "t(" + escape(text) + ");";
-            if ((_.last(code) == "}" || _.last(code) == "});") && text.trim() == "")
+            let instruction = "t(" + escape(text) + ");",
+                whitespace_text = text.trim() == "",
+                preceding_conditional = _.last(code) == "}",
+                preceding_iterator = _.last(code) == "});",
+                preceding_iterator_conditional = preceding_iterator && code[code.length - 2] == "}";
+
+            if (whitespace_text && preceding_iterator_conditional)
+                code.splice(-2, 0, instruction);
+            else if (whitespace_text && (preceding_iterator || preceding_conditional))
                 code.splice(-1, 0, instruction);
             else
                 code.push(instruction);

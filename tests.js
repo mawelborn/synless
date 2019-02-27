@@ -154,4 +154,7 @@ QUnit.test("Control Statements", function (assert) {
     assert.equal(Synless.precompile("<div sl-each=\"data\"></div> \t <div></div>", {collapse: false}).replace(closure_stripper, ""),
                  "function(data){_.each(data,function(_0,_1,_2){v(\"div\",_1+\"k0\");t(\" \\t \");});v(\"div\",\"k1\");}",
                  "Whitespace text binds to preceding iterator");
+    assert.equal(Synless.precompile("<div sl-each=\"data\" sl-if=\"true\"></div> \t <div></div>", {collapse: false}).replace(closure_stripper, ""),
+                 "function(data){_.each(data,function(_0,_1,_2){if(true){v(\"div\",_1+\"k0\");t(\" \\t \");}});v(\"div\",\"k1\");}",
+                 "Whitespace text binds to preceding conditional inside iterator");
 });
