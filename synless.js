@@ -9,7 +9,7 @@
         factory(root.Synless = {}, root._);
 })(typeof self !== "undefined" ? self : this, (Synless, _) => {
     "use strict";
-    Synless.VERSION = "0.8.1";
+    Synless.VERSION = "0.9.0";
     Synless.options = {variable: "data",
                        collapse: true,
                        strip: false};
