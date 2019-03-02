@@ -124,25 +124,25 @@ QUnit.test("Control Statements", function (assert) {
     assert.equal(Synless.precompile("<div sl-skip>Some <span>subcontent<span></div>").replace(closure_stripper, ""),
                  "function(data){o(\"div\",\"k0\");s();c(\"div\");}",
                  "Skip with children");
-    assert.equal(Synless.precompile("<div sl-each=\"data.items:item\"></div>").replace(closure_stripper, ""),
+    assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"item\"></div>").replace(closure_stripper, ""),
                  "function(data){_.each(data.items,function(item,_1,_2){v(\"div\",_1+\"k0\");},this);}",
                  "Each");
     assert.equal(Synless.precompile("<div sl-each=\"data.items\"></div>").replace(closure_stripper, ""),
                  "function(data){_.each(data.items,function(_0,_1,_2){v(\"div\",_1+\"k0\");},this);}",
                  "No Iteratee");
-    assert.equal(Synless.precompile("<div sl-each=\"data.items:\"></div>").replace(closure_stripper, ""),
+    assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"\"></div>").replace(closure_stripper, ""),
                  "function(data){_.each(data.items,function(_0,_1,_2){v(\"div\",_1+\"k0\");},this);}",
                  "Hanging Colon");
-    assert.equal(Synless.precompile("<div sl-each=\"data.items:item,index\"></div>").replace(closure_stripper, ""),
+    assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"item,index\"></div>").replace(closure_stripper, ""),
                  "function(data){_.each(data.items,function(item,index,_2){v(\"div\",index+\"k0\");},this);}",
                  "Index");
-    assert.equal(Synless.precompile("<div sl-each=\"data.items:item,index,source\"></div>").replace(closure_stripper, ""),
+    assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"item,index,source\"></div>").replace(closure_stripper, ""),
                  "function(data){_.each(data.items,function(item,index,source){v(\"div\",index+\"k0\");},this);}",
                  "Source");
     assert.equal(Synless.precompile("<div sl-key=\"data.key\"></div>").replace(closure_stripper, ""),
                  "function(data){v(\"div\",data.key);}",
                  "Key");
-    assert.equal(Synless.precompile("<div sl-each=\"data.items:item\" sl-key=\"item.id\"></div>").replace(closure_stripper, ""),
+    assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"item\" sl-key=\"item.id\"></div>").replace(closure_stripper, ""),
                  "function(data){_.each(data.items,function(item,_1,_2){v(\"div\",_1+item.id);},this);}",
                  "Each Key");
     assert.equal(Synless.precompile("<div sl-empty=\"data.items\" />").replace(closure_stripper, ""),

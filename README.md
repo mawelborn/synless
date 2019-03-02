@@ -249,13 +249,15 @@ elementClose("div");
 Each
 ----
 
-Use `sl-each` to repeat an element once for value in an array or object. Specify the name of the
-iterable, followed by a colon, followed by the name to assign the value to in each iteration. Each
-iteration inherits the `this` context argument from the containing scope.
+Use `sl-each` to repeat an element once for every value in an array or object. The value can be any
+valid JavaScript expression. Optionally specify the variable assignment for each iteration using
+`sl-as`. The value is used as the arguments list for the callback to `_.each()`, and can include an
+assignment for the value, key, and iterator. Each iteration inherits the `this` context argument
+from the containing scope (that of the entire template).
 
 ```HTML
 <ul>
-    <li sl-each="data.list_items:item">
+    <li sl-each="data.list_items" sl-as="item">
         <a sl-attr:href="item.url" sl-text="item.name"></a>
     </li>
 </ul>

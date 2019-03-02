@@ -128,17 +128,13 @@
         const hoist_var = hoist_attributes(el_attrs);
 
         if (_.has(sl_attrs, "sl-each")) {
-            let iterator, iteratee, index, rest;
-            [iterator, iteratee] = sl_attrs["sl-each"].split(":");
-            if (!iteratee || iteratee == "")
-                iteratee = "_0";
-            [iteratee, index, ...rest] = iteratee.split(",");
-            if (!index || index == "")
-                index = "_1";
-            if (rest.length == 0)
-                rest.push("_2");
-            key = `${index}+${key}`;
-            code.push(`_.each(${iterator},function(${iteratee},${index},${rest.join(",")}){`);
+            let iterator = sl_attrs["sl-each"];
+            let iteratee = sl_attrs["sl-as"] || "";
+            iteratee = iteratee.split(",");
+            _.each(_.range(3), i => iteratee[i] = iteratee[i] || "_" + i);
+            key = `${iteratee[1]}+${key}`;
+            iteratee = iteratee.join(",");
+            code.push(`_.each(${iterator},function(${iteratee}){`);
         }
 
         if (_.has(attrs, "class"))
