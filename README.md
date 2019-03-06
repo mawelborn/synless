@@ -151,6 +151,16 @@ as properties to work correctly.
 <input type="checkbox" sl-prop:checked="data.is_checked">
 ```
 
+Properties specified with `sl-prop:*` will be converted from dash-case to camelCase. This is to
+support specifying property names like `scrollTop` in environments where HTML attribute names are 
+case-insensitive and get converted to lower case.
+
+```HTML
+<div class="dropdown" sl-prop:scroll-top="current_item_index * 20">
+...
+</div>
+```
+
 
 ### Special Case: Style
 

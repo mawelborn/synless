@@ -176,12 +176,16 @@
     const sl_pattern = /^sl-/;
     const attr_pattern = /^sl-attr:/;
     const prop_pattern = /^sl-prop:/;
+    const dash_pattern = /-(\w)/;
+    const camel_replacement = (match, letter) => letter.toUpperCase();
     const get_attrs = element => {
         const sl = {}, el = {}, attrs = {}, as_props = [];
         _.each(element.attributes, attr => {
             if (prop_pattern.test(attr.nodeName)) {
-                as_props.push(attr.nodeName.replace(prop_pattern, ""));
-                attrs[attr.nodeName.replace(prop_pattern, "")] = attr.nodeValue;
+                var prop_name = attr.nodeName.replace(prop_pattern, "")
+                                             .replace(dash_pattern, camel_replacement);
+                as_props.push(prop_name);
+                attrs[prop_name] = attr.nodeValue;
             }
             if (attr_pattern.test(attr.nodeName))
                 attrs[attr.nodeName.replace(attr_pattern, "")] = attr.nodeValue;

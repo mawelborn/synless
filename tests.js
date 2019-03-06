@@ -100,12 +100,18 @@ QUnit.test("Attributes", function (assert) {
     assert.equal(Synless.precompile("<div sl-attr:class=\"data.class_list\">").replace(closure_stripper, ""),
                  "function(data){v(\"div\",\"k0\",null,\"class\",cls(data.class_list));}",
                  "Class");
+    assert.equal(Synless.precompile("<div sl-attr:data-dashed-case=\"data.something\"></div>").replace(closure_stripper, ""),
+                 "function(data){v(\"div\",\"k0\",null,\"data-dashed-case\",data.something);}",
+                 "Dash-Case Attribute");
 });
 
 QUnit.test("Properties", function (assert) {
     assert.equal(Synless.precompile("<input type=\"text\" sl-prop:disabled=\"data.disabled\">").replace(closure_stripper, ""),
                  "function(data){a[\"disabled\"]=ap;v(\"input\",\"k0\",a0,\"disabled\",data.disabled);a[\"disabled\"]=aa;}",
                  "Disabled Prop");
+    assert.equal(Synless.precompile("<div sl-prop:scroll-top=\"100\"></div>").replace(closure_stripper, ""),
+                 "function(data){a[\"scrollTop\"]=ap;v(\"div\",\"k0\",null,\"scrollTop\",100);a[\"scrollTop\"]=aa;}",
+                 "Dash-Case Property (Conversion To camelCase)");
 });
 
 QUnit.test("Control Statements", function (assert) {
