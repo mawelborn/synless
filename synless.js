@@ -45,6 +45,7 @@
         opts = _.extend({}, Synless.options, options);
         vars = ["cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));"
                      + "_.isArray(c)&&(c=c.join(\" \"));return c;}",
+                "e=_.each",
                 "t=IncrementalDOM.text",
                 "o=IncrementalDOM.elementOpen",
                 "c=IncrementalDOM.elementClose",
@@ -134,7 +135,7 @@
             _.each(_.range(3), i => iteratee[i] = iteratee[i] || "_" + i);
             key = `${iteratee[1]}+${key}`;
             iteratee = iteratee.join(",");
-            code.push(`_.each(${iterator},function(${iteratee}){`);
+            code.push(`e(${iterator},function(${iteratee}){`);
         }
 
         if (_.has(attrs, "class"))

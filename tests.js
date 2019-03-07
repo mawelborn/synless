@@ -6,7 +6,7 @@ QUnit.test("Compilation", function (assert) {
                  "function(data){}",
                  "Empty render function");
     assert.equal(Synless.precompile(),
-                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp;return function(data){};}())",
+                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},e=_.each,t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp;return function(data){};}())",
                  "IIFE with hoisted attributes");
 });
 
@@ -86,13 +86,13 @@ QUnit.test("Attributes", function (assert) {
                  "function(data){v(\"input\",\"k0\",a0);}",
                  "Input type text, Disabled");
     assert.equal(Synless.precompile("<input type=\"text\" disabled>"),
-                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"disabled\",\"\",\"type\",\"text\"];return function(data){v(\"input\",\"k0\",a0);};}())",
+                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},e=_.each,t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"disabled\",\"\",\"type\",\"text\"];return function(data){v(\"input\",\"k0\",a0);};}())",
                  "Hoisted Input type text, Disabled");
     assert.equal(Synless.precompile("<input type=\"text\" class=\"form-control\" value=\"something\"><input class=\"form-control\" value=\"something\" type=\"text\">"),
-                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"];return function(data){v(\"input\",\"k0\",a0);v(\"input\",\"k1\",a0);};}())",
+                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},e=_.each,t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"];return function(data){v(\"input\",\"k0\",a0);v(\"input\",\"k1\",a0);};}())",
                  "Reuse Hoisted");
     assert.equal(Synless.precompile("<input type=\"text\" class=\"form-control\" value=\"something\"><input type=\"text\" class=\"form-control\">"),
-                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"],a1=[\"class\",\"form-control\",\"type\",\"text\"];return function(data){v(\"input\",\"k0\",a0);v(\"input\",\"k1\",a1);};}())",
+                 "(function(){var cls=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},e=_.each,t=IncrementalDOM.text,o=IncrementalDOM.elementOpen,c=IncrementalDOM.elementClose,v=IncrementalDOM.elementVoid,s=IncrementalDOM.skip,a=IncrementalDOM.attributes,aa=IncrementalDOM.applyAttr,ap=IncrementalDOM.applyProp,a0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"],a1=[\"class\",\"form-control\",\"type\",\"text\"];return function(data){v(\"input\",\"k0\",a0);v(\"input\",\"k1\",a1);};}())",
                  "Differentiate Hoisted");
     assert.equal(Synless.precompile("<input type=\"text\" sl-attr:value=\"data.name\">").replace(closure_stripper, ""),
                  "function(data){v(\"input\",\"k0\",a0,\"value\",data.name);}",
@@ -131,25 +131,25 @@ QUnit.test("Control Statements", function (assert) {
                  "function(data){o(\"div\",\"k0\");s();c(\"div\");}",
                  "Skip with children");
     assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"item\"></div>").replace(closure_stripper, ""),
-                 "function(data){_.each(data.items,function(item,_1,_2){v(\"div\",_1+\"k0\");},this);}",
+                 "function(data){e(data.items,function(item,_1,_2){v(\"div\",_1+\"k0\");},this);}",
                  "Each");
     assert.equal(Synless.precompile("<div sl-each=\"data.items\"></div>").replace(closure_stripper, ""),
-                 "function(data){_.each(data.items,function(_0,_1,_2){v(\"div\",_1+\"k0\");},this);}",
+                 "function(data){e(data.items,function(_0,_1,_2){v(\"div\",_1+\"k0\");},this);}",
                  "No Iteratee");
     assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"\"></div>").replace(closure_stripper, ""),
-                 "function(data){_.each(data.items,function(_0,_1,_2){v(\"div\",_1+\"k0\");},this);}",
+                 "function(data){e(data.items,function(_0,_1,_2){v(\"div\",_1+\"k0\");},this);}",
                  "Hanging Colon");
     assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"item,index\"></div>").replace(closure_stripper, ""),
-                 "function(data){_.each(data.items,function(item,index,_2){v(\"div\",index+\"k0\");},this);}",
+                 "function(data){e(data.items,function(item,index,_2){v(\"div\",index+\"k0\");},this);}",
                  "Index");
     assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"item,index,source\"></div>").replace(closure_stripper, ""),
-                 "function(data){_.each(data.items,function(item,index,source){v(\"div\",index+\"k0\");},this);}",
+                 "function(data){e(data.items,function(item,index,source){v(\"div\",index+\"k0\");},this);}",
                  "Source");
     assert.equal(Synless.precompile("<div sl-key=\"data.key\"></div>").replace(closure_stripper, ""),
                  "function(data){v(\"div\",data.key);}",
                  "Key");
     assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"item\" sl-key=\"item.id\"></div>").replace(closure_stripper, ""),
-                 "function(data){_.each(data.items,function(item,_1,_2){v(\"div\",_1+item.id);},this);}",
+                 "function(data){e(data.items,function(item,_1,_2){v(\"div\",_1+item.id);},this);}",
                  "Each Key");
     assert.equal(Synless.precompile("<div sl-empty=\"data.items\" />").replace(closure_stripper, ""),
                  "function(data){if(!(data.items)||_.isEmpty(data.items)){v(\"div\",\"k0\");}}",
@@ -158,9 +158,9 @@ QUnit.test("Control Statements", function (assert) {
                  "function(data){if(data.bold){v(\"div\",\"k0\");t(\" \\t \");}else{v(\"div\",\"k1\");}}",
                  "Whitespace text binds to preceding conditional");
     assert.equal(Synless.precompile("<div sl-each=\"data\"></div> \t <div></div>", {collapse: false}).replace(closure_stripper, ""),
-                 "function(data){_.each(data,function(_0,_1,_2){v(\"div\",_1+\"k0\");t(\" \\t \");},this);v(\"div\",\"k1\");}",
+                 "function(data){e(data,function(_0,_1,_2){v(\"div\",_1+\"k0\");t(\" \\t \");},this);v(\"div\",\"k1\");}",
                  "Whitespace text binds to preceding iterator");
     assert.equal(Synless.precompile("<div sl-each=\"data\" sl-if=\"true\"></div> \t <div></div>", {collapse: false}).replace(closure_stripper, ""),
-                 "function(data){_.each(data,function(_0,_1,_2){if(true){v(\"div\",_1+\"k0\");t(\" \\t \");}},this);v(\"div\",\"k1\");}",
+                 "function(data){e(data,function(_0,_1,_2){if(true){v(\"div\",_1+\"k0\");t(\" \\t \");}},this);v(\"div\",\"k1\");}",
                  "Whitespace text binds to preceding conditional inside iterator");
 });
