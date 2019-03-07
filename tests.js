@@ -6,7 +6,7 @@ QUnit.test("Compilation", function (assert) {
                  "function(data){}",
                  "Empty render function");
     assert.equal(Synless.precompile(),
-                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp;return function(data){};}())",
+                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp;return function(data){};}())",
                  "IIFE with hoisted attributes");
 });
 
@@ -86,13 +86,13 @@ QUnit.test("Attributes", function (assert) {
                  "function(data){_v(\"input\",\"_k0\",_h0);}",
                  "Input type text, Disabled");
     assert.equal(Synless.precompile("<input type=\"text\" disabled>"),
-                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"disabled\",\"\",\"type\",\"text\"];return function(data){_v(\"input\",\"_k0\",_h0);};}())",
+                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"disabled\",\"\",\"type\",\"text\"];return function(data){_v(\"input\",\"_k0\",_h0);};}())",
                  "Hoisted Input type text, Disabled");
     assert.equal(Synless.precompile("<input type=\"text\" class=\"form-control\" value=\"something\"><input class=\"form-control\" value=\"something\" type=\"text\">"),
-                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"];return function(data){_v(\"input\",\"_k0\",_h0);_v(\"input\",\"_k1\",_h0);};}())",
+                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"];return function(data){_v(\"input\",\"_k0\",_h0);_v(\"input\",\"_k1\",_h0);};}())",
                  "Reuse Hoisted");
     assert.equal(Synless.precompile("<input type=\"text\" class=\"form-control\" value=\"something\"><input type=\"text\" class=\"form-control\">"),
-                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"],_h1=[\"class\",\"form-control\",\"type\",\"text\"];return function(data){_v(\"input\",\"_k0\",_h0);_v(\"input\",\"_k1\",_h1);};}())",
+                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"],_h1=[\"class\",\"form-control\",\"type\",\"text\"];return function(data){_v(\"input\",\"_k0\",_h0);_v(\"input\",\"_k1\",_h1);};}())",
                  "Differentiate Hoisted");
     assert.equal(Synless.precompile("<input type=\"text\" sl-attr:value=\"data.name\">").replace(closure_stripper, ""),
                  "function(data){_v(\"input\",\"_k0\",_h0,\"value\",data.name);}",
@@ -152,7 +152,7 @@ QUnit.test("Control Statements", function (assert) {
                  "function(data){_e(data.items,function(item,_1,_2){_v(\"div\",_1+item.id);},this);}",
                  "Each Key");
     assert.equal(Synless.precompile("<div sl-empty=\"data.items\" />").replace(closure_stripper, ""),
-                 "function(data){if(!(data.items)||_.isEmpty(data.items)){_v(\"div\",\"_k0\");}}",
+                 "function(data){if(!(data.items)||_i(data.items)){_v(\"div\",\"_k0\");}}",
                  "Empty");
     assert.equal(Synless.precompile("<div sl-if=\"data.bold\"></div> \t <div sl-else></div>", {collapse: false}).replace(closure_stripper, ""),
                  "function(data){if(data.bold){_v(\"div\",\"_k0\");_t(\" \\t \");}else{_v(\"div\",\"_k1\");}}",

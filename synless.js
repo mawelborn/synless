@@ -46,6 +46,7 @@
         vars = ["_k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));"
                     + "_.isArray(c)&&(c=c.join(\" \"));return c;}",
                 "_e=_.each",
+                "_i=_.isEmpty",
                 "_t=IncrementalDOM.text",
                 "_o=IncrementalDOM.elementOpen",
                 "_c=IncrementalDOM.elementClose",
@@ -142,7 +143,7 @@
             attrs["class"] = `_k(${attrs["class"]})`;
 
         if (_.has(sl_attrs, "sl-empty"))
-            sl_attrs["sl-if"] = `!(${sl_attrs["sl-empty"]})||_.isEmpty(${sl_attrs["sl-empty"]})`;
+            sl_attrs["sl-if"] = `!(${sl_attrs["sl-empty"]})||_i(${sl_attrs["sl-empty"]})`;
 
         if (_.has(sl_attrs, "sl-if"))
             code.push(`if(${sl_attrs["sl-if"]}){`);
