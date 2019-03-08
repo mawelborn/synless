@@ -85,7 +85,7 @@
 
     const compile_nodes = nodes => _.each(nodes, node => {
         if (node.nodeType == 9)
-            node == node.documentElement;
+            node = node.documentElement;
         if (node.nodeType == 3)
             compile_text(node);
         if (node.nodeType == 1)

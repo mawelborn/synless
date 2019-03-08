@@ -61,6 +61,9 @@ QUnit.test("Elements", function (assert) {
     assert.equal(Synless.precompile("<div></div>").replace(closure_stripper, ""),
                  "function(data){_v(\"div\",\"_k0\");}",
                  "Void element");
+    assert.notEqual(Synless.precompile(document).replace(closure_stripper, ""),
+                    "function(data){}",
+                    "Document objects");
 });
 
 QUnit.test("Text", function (assert) {
