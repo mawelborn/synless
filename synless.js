@@ -44,7 +44,8 @@
     const renderer_for = (nodes, options) => {
         opts = _.extend({}, Synless.options, options);
         vars = ["_k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));"
-                    + "_.isArray(c)&&(c=c.join(\" \"));return c;}",
+                    + "_.isArray(c)&&(c=c.join(_w));return c;}",
+                "_w=' '",
                 "_e=_.each",
                 "_i=_.isEmpty",
                 "_t=IncrementalDOM.text",
@@ -97,7 +98,7 @@
     const compile_text = node => {
         let text = compress(node.nodeValue);
         if (!opts.strip || text.length > 0) {
-            let instruction = "_t(" + escape(text) + ");",
+            let instruction = "_t(" + (text == single_space ? "_w" : escape(text)) + ");",
                 whitespace_text = text.trim() == "",
                 preceding_conditional = _.last(code) == close_conditional,
                 preceding_iterator = _.last(code) == close_iterator,
@@ -115,9 +116,10 @@
 
 
     const whitespace_pattern = /\s+/g;
+    const single_space = " ";
     const compress = text => {
         if (opts.collapse)
-            text = text.replace(whitespace_pattern, " ");
+            text = text.replace(whitespace_pattern, single_space);
         if (opts.strip)
             text = text.trim();
         return text;

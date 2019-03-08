@@ -6,7 +6,7 @@ QUnit.test("Compilation", function (assert) {
                  "function(data){}",
                  "Empty render function");
     assert.equal(Synless.precompile(),
-                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp;return function(data){};}())",
+                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(_w));return c;},_w=' ',_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp;return function(data){};}())",
                  "IIFE with hoisted attributes");
 });
 
@@ -15,10 +15,10 @@ QUnit.test("Configuration", function (assert) {
                  "function(template){}",
                  "Variable");
     assert.equal(Synless.precompile(" \t ").replace(closure_stripper, ""),
-                 "function(data){_t(\" \");}",
+                 "function(data){_t(_w);}",
                  "Collapse");
     assert.equal(Synless.precompile("  <div> \t String \t\t\t Thing \t <div />  </div>  ").replace(closure_stripper, ""),
-                 "function(data){_t(\" \");_o(\"div\",\"_k0\");_t(\" String Thing \");_o(\"div\",\"_k1\");_t(\" \");_c(\"div\");_t(\" \");_c(\"div\");}",
+                 "function(data){_t(_w);_o(\"div\",\"_k0\");_t(\" String Thing \");_o(\"div\",\"_k1\");_t(_w);_c(\"div\");_t(_w);_c(\"div\");}",
                  "Collapse");
     assert.equal(Synless.precompile("  <div> \t String \t\t\t Thing \t <div />  </div>  ", {collapse: false}).replace(closure_stripper, ""),
                  "function(data){_t(\"  \");_o(\"div\",\"_k0\");_t(\" \\t String \\t\\t\\t Thing \\t \");_o(\"div\",\"_k1\");_t(\"  \");_c(\"div\");_t(\"  \");_c(\"div\");}",
@@ -86,13 +86,13 @@ QUnit.test("Attributes", function (assert) {
                  "function(data){_v(\"input\",\"_k0\",_h0);}",
                  "Input type text, Disabled");
     assert.equal(Synless.precompile("<input type=\"text\" disabled>"),
-                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"disabled\",\"\",\"type\",\"text\"];return function(data){_v(\"input\",\"_k0\",_h0);};}())",
+                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(_w));return c;},_w=' ',_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"disabled\",\"\",\"type\",\"text\"];return function(data){_v(\"input\",\"_k0\",_h0);};}())",
                  "Hoisted Input type text, Disabled");
     assert.equal(Synless.precompile("<input type=\"text\" class=\"form-control\" value=\"something\"><input class=\"form-control\" value=\"something\" type=\"text\">"),
-                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"];return function(data){_v(\"input\",\"_k0\",_h0);_v(\"input\",\"_k1\",_h0);};}())",
+                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(_w));return c;},_w=' ',_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"];return function(data){_v(\"input\",\"_k0\",_h0);_v(\"input\",\"_k1\",_h0);};}())",
                  "Reuse Hoisted");
     assert.equal(Synless.precompile("<input type=\"text\" class=\"form-control\" value=\"something\"><input type=\"text\" class=\"form-control\">"),
-                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(\" \"));return c;},_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"],_h1=[\"class\",\"form-control\",\"type\",\"text\"];return function(data){_v(\"input\",\"_k0\",_h0);_v(\"input\",\"_k1\",_h1);};}())",
+                 "(function(){var _k=function(c){_.isObject(c)&&!_.isArray(c)&&(c=_.filter(_.keys(c),_.propertyOf(c)));_.isArray(c)&&(c=c.join(_w));return c;},_w=' ',_e=_.each,_i=_.isEmpty,_t=IncrementalDOM.text,_o=IncrementalDOM.elementOpen,_c=IncrementalDOM.elementClose,_v=IncrementalDOM.elementVoid,_s=IncrementalDOM.skip,_a=IncrementalDOM.attributes,_d=IncrementalDOM.applyAttr,_p=IncrementalDOM.applyProp,_h0=[\"class\",\"form-control\",\"type\",\"text\",\"value\",\"something\"],_h1=[\"class\",\"form-control\",\"type\",\"text\"];return function(data){_v(\"input\",\"_k0\",_h0);_v(\"input\",\"_k1\",_h1);};}())",
                  "Differentiate Hoisted");
     assert.equal(Synless.precompile("<input type=\"text\" sl-attr:value=\"data.name\">").replace(closure_stripper, ""),
                  "function(data){_v(\"input\",\"_k0\",_h0,\"value\",data.name);}",
