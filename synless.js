@@ -84,11 +84,11 @@
 
 
     const compile_nodes = nodes => _.each(nodes, node => {
-        if (node.nodeType == 9)
+        if (node.nodeType === 9)
             node = node.documentElement;
-        if (node.nodeType == 3)
+        if (node.nodeType === 3)
             compile_text(node);
-        if (node.nodeType == 1)
+        if (node.nodeType === 1)
             compile_element(node);
     });
 
@@ -98,12 +98,12 @@
     const compile_text = node => {
         let text = compress(node.nodeValue);
         if (!opts.strip || text.length > 0) {
-            let instruction = "_t(" + (text == single_space ? "_w" : escape(text)) + ");",
-                whitespace_text = text.trim() == "",
-                preceding_conditional = _.last(code) == close_conditional,
-                preceding_iterator = _.last(code) == close_iterator,
+            let instruction = "_t(" + (text === single_space ? "_w" : escape(text)) + ");",
+                whitespace_text = text.trim() === "",
+                preceding_conditional = _.last(code) === close_conditional,
+                preceding_iterator = _.last(code) === close_iterator,
                 preceding_iterator_conditional = (preceding_iterator
-                                                  && code[code.length - 2] == close_conditional);
+                                                  && code[code.length - 2] === close_conditional);
 
             if (whitespace_text && preceding_iterator_conditional)
                 code.splice(-2, 0, instruction);
@@ -207,7 +207,7 @@
     const vo_element = (func, el, key, hoist, attrs, as_props) => {
         _.each(as_props, prop => code.push(`_a[${escape(prop)}]=_p;`));
         code.push(`${func}(${tag_name(el)},${key}`);
-        if (hoist != "null" || _.keys(attrs).length > 0)
+        if (hoist !== "null" || _.keys(attrs).length > 0)
             code.push(`,${hoist}`);
         _.each(attrs, (value, name) => code.push(`,${escape(name)},${value}`));
         code.push(");");
@@ -228,7 +228,7 @@
 
 
     const hoist_attributes = attrs => {
-        if (_.keys(attrs).length == 0)
+        if (_.keys(attrs).length === 0)
             return "null";
         attrs = _.map(_.keys(attrs).sort(), key => `${escape(key)},${escape(attrs[key])}`);
         attrs = `[${attrs.join(",")}]`;
