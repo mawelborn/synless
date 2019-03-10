@@ -1,0 +1,18 @@
+{
+    "name": "synless",
+    "version": "1.0.0",
+    "author": "Michael Welborn",
+    "dependencies": {
+        "underscore": ">=1.6.0"
+    },
+    "devDependencies": {
+        "@babel/cli": "7.2.3",
+        "@babel/preset-env": "7.3.1",
+        "babel-minify": "0.5.0",
+        "eslint": "5.12.1",
+        "qunit": "2.9.2"
+    },
+    "scripts": {
+        "build": "babel synless.js | minify > synless-min.js && sed -i -re 's/(.*)(\\/\\*.*\\*\\/)([(]function[(]a,b[)][{]\"use strict\";.*\"use strict\";)/\\2\\n\\3\\1/g' synless-min.js"
+    }
+}
