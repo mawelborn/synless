@@ -1,4 +1,4 @@
-/* global define, exports, require, self, document, DocumentFragment, NodeList, HTMLCollection, IncrementalDOM */
+/*! Synless.js 0.9.1 | (c) Michael Welborn | Synless is MIT licensed */
 ((root, factory) => {
     "use strict";
     if (typeof define === "function" && define.amd)
