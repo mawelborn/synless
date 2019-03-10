@@ -2,12 +2,12 @@
 ((root, factory) => {
     "use strict";
     if (typeof define === "function" && define.amd)
-        define(["exports", "underscore"], factory);
+        define(["exports", "underscore", "incremental-dom"], factory);
     else if (typeof exports !== "undefined")
-        factory(exports, require("underscore"));
+        factory(exports, require("underscore"), require("incremental-dom"));
     else
-        factory(root.Synless = {}, root._);
-})(typeof self !== "undefined" ? self : this, (Synless, _) => {
+        factory(root.Synless = {}, root._, root.IncrementalDOM);
+})(typeof self !== "undefined" ? self : this, (Synless, _, IncrementalDOM) => {
     "use strict";
     Synless.VERSION = "0.9.1";
     Synless.options = {variable: "data",
