@@ -167,3 +167,9 @@ QUnit.test("Control Statements", function (assert) {
                  "function(data){_e(data,function(_0,_1,_2){if(true){_v(\"div\",_1+\"_k0\");_t(\" \\t \");}},this);_v(\"div\",\"_k1\");}",
                  "Whitespace text binds to preceding conditional inside iterator");
 });
+
+QUnit.test("Omitting Elements", function (assert) {
+    assert.equal(Synless.precompile("<p></p><div sl-omit></div><p></p>").replace(closure_stripper, ""),
+                 "function(data){_v(\"p\",\"_k0\");_v(\"p\",\"_k1\");}",
+                 "Omit");
+});

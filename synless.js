@@ -128,6 +128,10 @@
 
     const compile_element = element => {
         const [sl_attrs, el_attrs, attrs, as_props] = get_attrs(element);
+
+        if (_.has(sl_attrs, "sl-omit"))
+            return;
+
         let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : literal(unique_id("_k"));
         const hoist_var = hoist_attributes(el_attrs);
 

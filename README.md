@@ -295,6 +295,7 @@ Directive|Description
 `sl-key`|Assign a unique key to this element.
 `sl-if`, `sl-elif`, `sl-else`|Conditionally render this element.
 `sl-empty`|Conditionally render this element if the expression is empty.
+`sl-omit`|Skip this element during compilation.
 
 
 ## Assignment Directives
@@ -566,7 +567,22 @@ Would be like:
 ```
 
 
+## Omit Element
+
+Use `sl-omit` to skip an element during the compilation process and omit it from the template
+entirely. No other directives are processed on the element.
+
+```HTML
+<div sl-omit>
+    <!-- This element and it's children are ignored entirely. -->
+</div>
+```
+
+
 # Changelog
+
+## v1.1.0
+- Add `sl-omit` directive to ignore an element during compilation.
 
 ## v1.0.0
 - Initial stable release.
