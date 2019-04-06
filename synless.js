@@ -98,7 +98,7 @@
     const compile_text = node => {
         let text = compress(node.nodeValue);
         if (!opts.strip || text.length > 0) {
-            let instruction = "_t(" + (text === single_space ? "_w" : escape(text)) + ");",
+            let instruction = "_t(" + (text === single_space ? "_w" : literal(text)) + ");",
                 whitespace_text = text.trim() === "",
                 preceding_conditional = _.last(code) === close_conditional,
                 preceding_iterator = _.last(code) === close_iterator,
@@ -128,7 +128,7 @@
 
     const compile_element = element => {
         const [sl_attrs, el_attrs, attrs, as_props] = get_attrs(element);
-        let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : escape(unique_id("_k"));
+        let key = _.has(sl_attrs, "sl-key") ? sl_attrs["sl-key"] : literal(unique_id("_k"));
         const hoist_var = hoist_attributes(el_attrs);
 
         if (_.has(sl_attrs, "sl-each")) {
@@ -205,13 +205,13 @@
     const void_element = (...args) => vo_element("_v", ...args);
     const open_element = (...args) => vo_element("_o", ...args);
     const vo_element = (func, el, key, hoist, attrs, as_props) => {
-        _.each(as_props, prop => code.push(`_a[${escape(prop)}]=_p;`));
+        _.each(as_props, prop => code.push(`_a[${literal(prop)}]=_p;`));
         code.push(`${func}(${tag_name(el)},${key}`);
         if (hoist !== "null" || _.keys(attrs).length > 0)
             code.push(`,${hoist}`);
-        _.each(attrs, (value, name) => code.push(`,${escape(name)},${value}`));
+        _.each(attrs, (value, name) => code.push(`,${literal(name)},${value}`));
         code.push(");");
-        _.each(as_props, prop => code.push(`_a[${escape(prop)}]=_d;`));
+        _.each(as_props, prop => code.push(`_a[${literal(prop)}]=_d;`));
     };
 
 
@@ -230,7 +230,7 @@
     const hoist_attributes = attrs => {
         if (_.keys(attrs).length === 0)
             return "null";
-        attrs = _.map(_.keys(attrs).sort(), key => `${escape(key)},${escape(attrs[key])}`);
+        attrs = _.map(_.keys(attrs).sort(), key => `${literal(key)},${literal(attrs[key])}`);
         attrs = `[${attrs.join(",")}]`;
         if (_.has(hoisted, attrs))
             return hoisted[attrs];
@@ -243,14 +243,14 @@
     };
 
 
-    const tag_name = el => escape(el.nodeName.toLowerCase());
+    const tag_name = el => literal(el.nodeName.toLowerCase());
 
 
     const escapes = {"\n": "\\n",
                      "\r": "\\r",
                      "\t": "\\t",
                      "\"": "\\\""};
-    const escape = value => (
+    const literal = value => (
         "\""
         + _.reduce(_.pairs(escapes),
                    (value, [unescaped, escaped]) => value.split(unescaped).join(escaped),
