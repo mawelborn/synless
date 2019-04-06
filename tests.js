@@ -179,3 +179,9 @@ QUnit.test("Omitting Elements", function (assert) {
                  "function(data){_v(\"p\",\"_k0\");_t(_w);_v(\"p\",\"_k1\");}",
                  "Omit collapse whitespace");
 });
+
+QUnit.test("Evaluation", function (assert) {
+    assert.equal(Synless.precompile("<p></p><div sl-eval=\"console.log(_w);\"></div><p></p>").replace(closure_stripper, ""),
+                 "function(data){_v(\"p\",\"_k0\");console.log(_w);_v(\"p\",\"_k2\");}",
+                 "Eval");
+});

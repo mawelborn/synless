@@ -296,6 +296,7 @@ Directive|Description
 `sl-if`, `sl-elif`, `sl-else`|Conditionally render this element.
 `sl-empty`|Conditionally render this element if the expression is empty.
 `sl-omit`|Skip this element during compilation.
+`sl-eval`|Execute arbitrary JavaScript statements in place of an element.
 
 
 ## Assignment Directives
@@ -579,10 +580,78 @@ entirely. No other directives are processed on the element.
 ```
 
 
+## Evaluation
+
+Use `sl-eval` to execute arbitrary JavaScript statements in place of the element this directive is
+found on. The element and any children are omitted from the compiled template (as `sl-omit` does).
+This statement can be used to execute other Incremental DOM render functions created with
+`Synless.compile`, allowing for composable component-like behavior. Unlike `Synless.template` which
+patches the DOM tree below the specified element, this *replaces* the element's DOM tree.
+
+```HTML
+<div class="form-group" sl-key="data.name">
+    <label class="control-label" sl-text="data.label"></label>
+    <input type="text" class="form-control" sl-attr:name="data.name">
+</div>
+...
+<form>
+    <div sl-eval="data.field_component({label: 'Email', name: 'email'})"></div>
+    <div sl-eval="data.field_component({label: 'Username', name: 'username'})"></div>
+    <div sl-eval="data.field_component({label: 'Password', name: 'password'})"></div>
+</form>
+```
+
+Using the following Javascript:
+
+```JavaScript
+var template = Synless.template(document.querySelector("form").childNodes);
+var field_component = Synless.compile(document.querySelector("div.form-group"));
+template(document.querySelector("form"), {field_component: field_component});
+```
+
+Would be like:
+
+```HTML
+<form>
+    <div class="form-group" sl-key="email">
+        <label class="control-label" sl-text="Email"></label>
+        <input type="text" class="form-control" sl-attr:name="email">
+    </div>
+    <div class="form-group" sl-key="username">
+        <label class="control-label" sl-text="Username"></label>
+        <input type="text" class="form-control" sl-attr:name="username">
+    </div>
+    <div class="form-group" sl-key="password">
+        <label class="control-label" sl-text="Password"></label>
+        <input type="text" class="form-control" sl-attr:name="password">
+    </div>
+</form>
+```
+
+This directive can be combined with the control directives `sl-if`, `sl-elif`, `sl-else`, `sl-each`,
+and `sl-empty` on the same element.
+
+Note that when calling a separate render function using `sl-eval`, the inner render function's
+auto-generated element keys may collide with sibling elements in the outer render function. It's a
+good idea to set an explicit unique `sl-key` or pass in a key from the outer iterator if it's in
+one. This is why `sl-key` is specified in the preceeding example. Otherwise, each `div.form-group`
+would have the same key.
+
+```HTML
+<div class="component" sl-key="data.key">
+    ...
+</div>
+...
+<div sl-each="data.models" sl-as="model,index" 
+     sl-eval="data.component({model: model, key: index})"></div>
+```
+
+
 # Changelog
 
 ## v1.1.0
 - Add `sl-omit` directive to ignore an element during compilation.
+- Add `sl-eval` directive for executing arbitary JavaScript and partial template functions.
 
 ## v1.0.0
 - Initial stable release.

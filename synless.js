@@ -167,6 +167,8 @@
         else if (_.has(sl_attrs, "sl-text"))
             wrap_with_element(element, key, hoist_var, attrs, as_props,
                               `_t(${sl_attrs["sl-text"]});`);
+        else if (_.has(sl_attrs, "sl-eval"))
+            code.push(sl_attrs["sl-eval"]);
         else if (_.isEmpty(element.childNodes))
             void_element(element, key, hoist_var, attrs, as_props);
         else {
