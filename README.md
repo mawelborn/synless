@@ -10,6 +10,7 @@
 | [API](#api)
 | [Configuration](#configuration)
 | [Template Directives](#template-directives)
+| [Changelog](#changelog)
 
 
 Synless is an HTML template compiler that targets
@@ -563,3 +564,28 @@ Would be like:
     }
 </ul>
 ```
+
+
+# Changelog
+
+## v1.0.0
+- Initial stable release.
+- Hoist Underscore and IncrementalDOM functions for improved performance and template compactness.
+- Prefix hoisted variables with underscores to avoid collisions with user defined variables.
+- Fix a bug where the contents of Document types (nodeType == 9) were discarded.
+
+## v0.9.1
+- Convert dash case `sl-prop:*` directive values to camel case to support setting properties like
+  `element.scrollTop`.
+
+## v0.9.0
+- Breaking Change: separate the conbined `sl-each` syntax for iteratee and iterator variables into 
+  separate `sl-each` and `sl-as` directives.
+
+## v0.8.1
+- Add an optional context argument to `Synless.template` that will be bound to `this` within the
+  template.
+- Make iterators inherit their parent's `this` context instead of it being null.
+
+## v0.8.0
+- Initial functional version.
