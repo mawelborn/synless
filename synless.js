@@ -95,11 +95,15 @@
 
     const close_conditional = "}";
     const close_iterator = "},this);";
+    const whitespace_instruction = "_t(_w);";
     const compile_text = node => {
         let text = compress(node.nodeValue);
         if (!opts.strip || text.length > 0) {
             let instruction = "_t(" + (text === single_space ? "_w" : literal(text)) + ");",
                 whitespace_text = text.trim() === "",
+                preceding_whitespace = _.last(code) === whitespace_instruction,
+                duplicate_whitespace = (opts.collapse && preceding_whitespace
+                                        && instruction === whitespace_instruction),
                 preceding_conditional = _.last(code) === close_conditional,
                 preceding_iterator = _.last(code) === close_iterator,
                 preceding_iterator_conditional = (preceding_iterator
@@ -109,7 +113,7 @@
                 code.splice(-2, 0, instruction);
             else if (whitespace_text && (preceding_iterator || preceding_conditional))
                 code.splice(-1, 0, instruction);
-            else
+            else if (!duplicate_whitespace)
                 code.push(instruction);
         }
     };
