@@ -119,7 +119,7 @@
     };
 
 
-    const whitespace_pattern = /\s+/g;
+    const whitespace_pattern = /[ \t\r\n\f]+/g;
     const single_space = " ";
     const compress = text => {
         if (opts.collapse)

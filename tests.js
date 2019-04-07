@@ -29,6 +29,9 @@ QUnit.test("Configuration", function (assert) {
     assert.equal(Synless.precompile("  <div> \t String \t\t\t Thing \t <div />  </div>  ", {collapse: false, strip: true}).replace(closure_stripper, ""),
                  "function(data){_o(\"div\",\"_k0\");_t(\"String \\t\\t\\t Thing\");_o(\"div\",\"_k1\");_c(\"div\");_c(\"div\");}",
                  "Strip, No Collapse");
+    assert.equal(Synless.precompile("<div> \t\r\n\f&nbsp;</div>").replace(closure_stripper, ""),
+                 "function(data){_o(\"div\",\"_k0\");_t(\" \u00A0\");_c(\"div\");}",
+                 "Unicode Whitespace");
 });
 
 QUnit.test("String vs DOM input", function (assert) {

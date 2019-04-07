@@ -256,7 +256,7 @@ Specify template compilation options globally using `Synless.options` or per tem
 Option|Description
 ------|-----------
 variable|The name of the variable that data passed to the render function will be assigned to.<br>Default: `"data"`
-collapse|Collapse contiguous runs of whitespace into single spaces. This reduces compiled template size but will not affect element layout or spacing.<br>Default: `true`
+collapse|Collapse contiguous runs of ASCII whitespace into single spaces. This reduces compiled template size but will not affect element layout or spacing.<br>Default: `true`
 strip|Strip whitespace from the beginning and end of text nodes. If a stripped text node is empty, it is omitted from the compiled template entirely. This further reduces compiled template size but can affect element layout and the spacing of inline elements.<br>Default: `false`
 
 
@@ -652,6 +652,7 @@ would have the same key.
 ## v1.1.0
 - Add `sl-omit` directive to ignore an element during compilation.
 - Add `sl-eval` directive for executing arbitary JavaScript and partial template functions.
+- Only collapse ASCII whitespace per the HTML specification.
 
 ## v1.0.0
 - Initial stable release.
