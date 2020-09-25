@@ -13,7 +13,11 @@
     Synless.options = {variable: "data",
                        collapse: true,
                        strip: false};
-    Synless.compile = (nodes, options) => (new Function(renderer_for(nodes, options)))();
+    Synless.compile = (nodes, options) => {
+        const renderer = renderer_for(nodes, options);
+        const source_url = "//# sourceURL=" + _.uniqueId("synless_render_") + ".js";
+        return (new Function(renderer + source_url))();
+    };
     Synless.precompile = (nodes, options) => `(function(){${renderer_for(nodes, options)}}())`;
     Synless.template = (nodes, options) => {
         const render = Synless.compile(nodes, options);

@@ -232,6 +232,9 @@ var render_function = Synless.compile(html);
 IncrementalDOM.patch(element, render_function, data);
 ```
 
+Render functions compiled client-side contain `sourceURL` directives to make them easier to find and
+debug in the developer console. Look for sources named `synless_render_####.js`.
+
 
 ## Synless.precompile(html[, options])
 
@@ -648,6 +651,9 @@ would have the same key.
 
 
 # Changelog
+
+## v1.2.0
+- Add `sourceURL` directive to render functions compiled client-side.
 
 ## v1.1.0
 - Add `sl-omit` directive to ignore an element during compilation.
