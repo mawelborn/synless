@@ -1,4 +1,4 @@
-/*! Synless.js 1.2.0 | (c) Michael Welborn | Synless is MIT licensed */
+/*! Synless.js 1.2.1 | (c) Michael Welborn | Synless is MIT licensed */
 ((root, factory) => {
     "use strict";
     if (typeof define === "function" && define.amd)
@@ -9,7 +9,7 @@
         factory(root.Synless = {}, root._, root.IncrementalDOM);
 })(typeof self !== "undefined" ? self : this, (Synless, _, IncrementalDOM) => {
     "use strict";
-    Synless.VERSION = "1.2.0";
+    Synless.VERSION = "1.2.1";
     Synless.options = {variable: "data",
                        collapse: true,
                        strip: false};
