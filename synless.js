@@ -148,7 +148,9 @@
             let iteratee = sl_attrs["sl-as"] || "";
             iteratee = iteratee.split(",");
             _.each(_.range(3), i => iteratee[i] = iteratee[i] || "_" + i);
-            key = `${iteratee[1]}+${key}`;
+            key = _.has(sl_attrs, "sl-key")
+                  ? `${key}+${literal(unique_id("_k"))}`
+                  : `${iteratee[1]}+${key}`;
             iteratee = iteratee.join(",");
             code.push(`_e(${iterator},function(${iteratee}){`);
         }

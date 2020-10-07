@@ -155,7 +155,7 @@ QUnit.test("Control Statements", function (assert) {
                  "function(data){_v(\"div\",data.key);}",
                  "Key");
     assert.equal(Synless.precompile("<div sl-each=\"data.items\" sl-as=\"item\" sl-key=\"item.id\"></div>").replace(closure_stripper, ""),
-                 "function(data){_e(data.items,function(item,_1,_2){_v(\"div\",_1+item.id);},this);}",
+                 "function(data){_e(data.items,function(item,_1,_2){_v(\"div\",item.id+\"_k0\");},this);}",
                  "Each Key");
     assert.equal(Synless.precompile("<div sl-empty=\"data.items\" />").replace(closure_stripper, ""),
                  "function(data){if(!(data.items)||_i(data.items)){_v(\"div\",\"_k0\");}}",

@@ -652,6 +652,9 @@ would have the same key.
 
 # Changelog
 
+## v1.2.1
+- Fix a bug in `sl-each` that defeated the optimizations afforded by specifying a custom `sl-key`.
+
 ## v1.2.0
 - Add `sourceURL` directive to render functions compiled client-side.
 
